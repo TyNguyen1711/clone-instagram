@@ -1,6 +1,8 @@
 import { User } from "../models/user.model.js";
 import brcypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../util/datauri.js";
+import cloudinary from "../config/cloudinary.js";
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -96,7 +98,10 @@ export const logout = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById({ userId });
+    console.log("userId: ", userId);
+    const user = await User.findById({ _id: userId });
+    console.log("userId2: ", user);
+
     return res.status(200).json({
       success: true,
       user,
@@ -110,8 +115,14 @@ export const editProfile = async (req, res) => {
   try {
     const userId = req.id;
     const { bio, gender } = req.body;
-    const profilePicture = req.file.path;
-    const user = await User.findById({ userId });
+    const profilePicture = req.file;
+    let cloudResponse;
+    if (profilePicture) {
+      const fileUri = getDataUri(profilePicture);
+      cloudResponse = await cloudinary.uploader.upload(fileUri);
+
+    }
+    const user = await User.findById({ _id: userId });
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -120,7 +131,7 @@ export const editProfile = async (req, res) => {
     }
     if (bio) user.bio = bio;
     if (gender) user.gender = gender;
-    if (profilePicture) user.profilePicture = profilePicture;
+    if (profilePicture) user.profilePicture = cloudResponse.secure_url;
     await user.save();
     return res.status(200).json({
       success: true,
