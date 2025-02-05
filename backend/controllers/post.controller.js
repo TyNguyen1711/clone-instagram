@@ -6,56 +6,51 @@ import { User } from "../models/user.model.js";
 import {Comment} from "../models/comment.model.js";
 export const addNewPost = async (req, res) => {
   try {
-    const { caption } = req.body;
-    const image = req.file.path;
-    const authorId = req.id;
-    if (!image) {
-      return res.status(400).json({
-        success: false,
-        mes: "Image required",
+      const { caption } = req.body;
+      const image = req.file;
+      const authorId = req.id;
+
+      if (!image) return res.status(400).json({ message: 'Image required' });
+
+      const optimizedImageBuffer = await sharp(image.buffer)
+          .resize({ width: 800, height: 800, fit: 'inside' })
+          .toBuffer();
+      const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString('base64')}`;
+      const cloudResponse = await cloudinary.uploader.upload(fileUri);
+      const post = await Post.create({
+          caption,
+          image: cloudResponse.secure_url,
+          author: authorId
       });
-    }
-    const optimizedImageBuffer = await sharp(image.buffer)
-      .resize({ width: 800, height: 800, fit: "inside" })
-      .toFormat("jpeg", { quality: 80 })
-      .toBuffer();
+      const user = await User.findById(authorId);
+      if (user) {
+          user.posts.push(post._id);
+          await user.save();
+      }
 
-    const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
-      "base64"
-    )}`;
-    const cloudResponse = await cloudinary.uploader.upload(fileUri);
-    const post = await Post.create({
-      caption,
-      image: cloudResponse.secure_url,
-      author: authorId,
-    });
-    const user = await User.findById({ _id: authorId });
-    if (user) {
-      user.posts.push(post._id);
-      await user.save();
-    }
-    await post.populate({ path: "author", select: "-password" });
-    return res.status(201).json({
-      mes: "New post added",
-      post,
-      seccess: true,
-    });
+      await post.populate({ path: 'author', select: '-password' });
+
+      return res.status(201).json({
+          message: 'New post added',
+          post,
+          success: true,
+      })
+
   } catch (error) {
-    throw error;
+      console.log(error);
   }
-};
-
+}
 export const getAllPost = async (req, res) => {
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate({ path: "author", select: "username, profilePicture" })
+      .populate({ path: "author", select: "username profilePicture" })
       .populate({
-        path: "comments",
+        path: "comment",
         sort: { createdAt: -1 },
         populate: {
           path: "author",
-          select: "username, profilePicture",
+          select: "username profilePicture",
         },
       });
     return res.status(200).json({

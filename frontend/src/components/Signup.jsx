@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Button } from "./ui/button";
-import { register } from "../services/api/user.js";
+import { registerApi } from "../services/api/user.js";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -69,7 +70,8 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     if (validateForms()) {
-      const response = await register(input);
+      const response = await registerApi(input);
+      console.log("res: ", response);
       if (response.success) {
         toast.success(response.mes);
         setInput({
@@ -137,6 +139,12 @@ const Signup = () => {
           </div>
 
           <Button>Signup</Button>
+          <span className="text-center">
+            Already have an account?{" "}
+            <Link to="/login" className="text-blue-600">
+              Login
+            </Link>
+          </span>
         </form>
       </div>
     </>
