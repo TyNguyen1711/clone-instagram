@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { BookMarked, MessageCircle, MoreHorizontal, Send } from "lucide-react";
-import { FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog.jsx";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,7 +34,19 @@ const Post = ({ post }) => {
       const updateLike = liked ? postLike - 1 : postLike + 1;
       setPostLike(updateLike);
       setLiked(!liked);
-      toast.success(response.mes);
+
+      const updatePostsData = posts.map((p) =>
+        p._id === post._id
+          ? {
+              ...p,
+              likes: liked
+                ? p.likes.filter((id) => id !== user._id)
+                : [...p.likes, user._id],
+            }
+          : p
+      );
+      dispatch(setPosts(updatePostsData));
+      toast.success(response.message);
     }
   };
   return (
@@ -81,7 +93,20 @@ const Post = ({ post }) => {
       <div>
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
-            <FaRegHeart onClick={handleLikeOrDislike} size={"22px"} />
+            {liked ? (
+              <FaHeart
+                size={"22"}
+                onClick={handleLikeOrDislike}
+                className="cursor-pointer text-red-600"
+              />
+            ) : (
+              <FaRegHeart
+                onClick={handleLikeOrDislike}
+                className="cursor-pointer hover:text-gray-600"
+                size={"22px"}
+              />
+            )}
+
             <MessageCircle
               className="cursor-pointer hover:text-gray-600"
               onClick={() => setOpen(true)}
