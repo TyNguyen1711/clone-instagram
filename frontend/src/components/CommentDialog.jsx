@@ -1,14 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "./ui/button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { commentPostApi } from "@/services/api/post.js";
+import { setPosts } from "@/redux/postSlice.js";
+import { toast } from "sonner";
 import Comment from "./Comment";
+
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
   const { selectedPost } = useSelector((state) => state.post);
+  const { posts } = useSelector((state) => state.post);
+  const [comment, setComment] = useState(selectedPost.comments);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (selectedPost) {
+      setComment(selectedPost.comments);
+    }
+  });
   const handleChangeInput = (e) => {
     const inputText = e.target.value;
     if (inputText.trim()) {
@@ -17,17 +30,38 @@ const CommentDialog = ({ open, setOpen }) => {
       setText("");
     }
   };
+
+  const sendMessageHandler = async () => {
+    const response = await commentPostApi(selectedPost._id, text);
+    if (response.success) {
+      toast.success(response.message);
+      setComment([response.comment, ...comment]);
+      const updatePostsData = posts.map((p) =>
+        p._id === selectedPost._id
+          ? {
+              ...p,
+              comments: [response.comment, ...p.comments],
+            }
+          : p
+      );
+      setText("");
+      dispatch(setPosts(updatePostsData));
+    }
+  };
+
   return (
     <Dialog open={open}>
       <DialogContent
         onInteractOutside={() => setOpen(false)}
         className="max-w-5xl p-0 flex flex-col"
       >
+        {/* Rest of your component remains the same */}
         <div className="flex flex-1">
           <div>
             <img
               className="w-full h-full object-cover rounded-l-lg"
               src={selectedPost?.image}
+              alt="post"
             />
           </div>
 
@@ -38,7 +72,7 @@ const CommentDialog = ({ open, setOpen }) => {
                   <Avatar>
                     <AvatarImage
                       src={selectedPost?.author.profilePicture}
-                      alt="post_image"
+                      alt="profile"
                     />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
@@ -47,7 +81,6 @@ const CommentDialog = ({ open, setOpen }) => {
                   <Link className="font-semibold text-xs">
                     {selectedPost?.author.username}
                   </Link>
-            
                 </div>
               </div>
 
@@ -65,7 +98,7 @@ const CommentDialog = ({ open, setOpen }) => {
             </div>
             <hr />
             <div className="flex-1 p-4 max-h-96 overflow-y-auto">
-              {selectedPost?.comments.map((comment, index) => (
+              {comment.map((comment, index) => (
                 <Comment key={index} comment={comment} />
               ))}
             </div>
@@ -81,6 +114,7 @@ const CommentDialog = ({ open, setOpen }) => {
                 disabled={!text.trim()}
                 variant="ghost"
                 className="border"
+                onClick={sendMessageHandler}
               >
                 Send
               </Button>
@@ -91,4 +125,5 @@ const CommentDialog = ({ open, setOpen }) => {
     </Dialog>
   );
 };
+
 export default CommentDialog;

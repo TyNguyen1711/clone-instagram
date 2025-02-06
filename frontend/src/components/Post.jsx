@@ -11,6 +11,7 @@ import { setPosts } from "@/redux/postSlice.js";
 import { toast } from "sonner";
 import { likeOrDislikeHandler } from "@/services/api/post.js";
 import { setSelectedPost } from "@/redux/postSlice.js";
+import { Badge } from "./ui/badge";
 const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
@@ -18,7 +19,6 @@ const Post = ({ post }) => {
   const { posts } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLike, setPostLike] = useState(post.likes.length);
-  const { selectedPost } = useSelector((state) => state.post);
 
   const dispatch = useDispatch();
   const handlerDeletePost = async () => {
@@ -78,6 +78,9 @@ const Post = ({ post }) => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <h1>{post.author?.username}</h1>
+          {post.author._id === user._id && (
+            <Badge className="bg-gray-100 rounded-xl" variant="destructive">Author</Badge>
+          )}
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -130,6 +133,7 @@ const Post = ({ post }) => {
             <MessageCircle
               className="cursor-pointer hover:text-gray-600"
               onClick={() => {
+                console.log(199);
                 setOpen(true);
                 dispatch(setSelectedPost(post));
               }}
@@ -143,12 +147,15 @@ const Post = ({ post }) => {
           <span className="font-medium mr-2">{post.author?.username}</span>
           {post.caption}
         </p>
-        <span
-          onClick={() => setOpen(true)}
-          className="cursor-pointer text-sm text-gray-400"
-        >
-          View all {post.comments.length} comments
-        </span>
+        {post.comments.length > 0 && (
+          <span
+            onClick={() => setOpen(true)}
+            className="cursor-pointer text-sm text-gray-400"
+          >
+            View all {post.comments.length} comments
+          </span>
+        )}
+
         <CommentDialog open={open} setOpen={setOpen} />
         <div className="flex my-2 items-center">
           <input
