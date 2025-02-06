@@ -14,14 +14,14 @@ const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
   const { selectedPost } = useSelector((state) => state.post);
   const { posts } = useSelector((state) => state.post);
-  const [comment, setComment] = useState(selectedPost.comments);
+  const [comment, setComment] = useState(selectedPost?.comments);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (selectedPost) {
       setComment(selectedPost.comments);
     }
-  });
+  }, [selectedPost]);
   const handleChangeInput = (e) => {
     const inputText = e.target.value;
     if (inputText.trim()) {
@@ -36,7 +36,7 @@ const CommentDialog = ({ open, setOpen }) => {
     if (response.success) {
       toast.success(response.message);
       setComment([response.comment, ...comment]);
-      const updatePostsData = posts.map((p) =>
+      const updatePostsData = posts?.map((p) =>
         p._id === selectedPost._id
           ? {
               ...p,
@@ -98,7 +98,7 @@ const CommentDialog = ({ open, setOpen }) => {
             </div>
             <hr />
             <div className="flex-1 p-4 max-h-96 overflow-y-auto">
-              {comment.map((comment, index) => (
+              {comment?.map((comment, index) => (
                 <Comment key={index} comment={comment} />
               ))}
             </div>

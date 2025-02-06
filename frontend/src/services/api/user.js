@@ -35,7 +35,17 @@ export const logoutApi = async () => {
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);
+    throw error;
+  }
+};
 
+export const suggestedUsersApi = async () => {
+  try {
+    const response = await axios.get("/user/suggested");
+    console.log("res: ", response);
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
     throw error;
   }
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
-import SuggestUser from "./SuggestUser";
+import SuggestedUsers from "./SuggestedUsers.jsx";
 const RightSidebar = () => {
   const { user } = useSelector((state) => state.auth);
   return (
@@ -23,7 +23,7 @@ const RightSidebar = () => {
           </span>
         </div>
       </div>
-      <SuggestUser />
+      <SuggestedUsers />
     </div>
   );
 };
