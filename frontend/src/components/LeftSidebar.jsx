@@ -12,11 +12,14 @@ import { logoutApi } from "@/services/api/user.js";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
+import { setPosts } from "@/redux/postSlice";
+import { setSelectedPost } from "@/redux/postSlice";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
 const LeftSidebar = () => {
   const { user } = useSelector((state) => state.auth);
   const [openCreatePost, setOpenCreatePost] = useState(false);
+
   const sidebarItems = [
     { icon: <Home />, text: "Home" },
     { icon: <Search />, text: "Search" },
@@ -41,6 +44,8 @@ const LeftSidebar = () => {
     const response = await logoutApi();
     if (response.success) {
       dispatch(setAuthUser(null));
+      dispatch(setPosts([]));
+      dispatch(setSelectedPost(null));
       navigate("/login");
     }
   };

@@ -31,7 +31,7 @@ const CommentDialog = ({ open, setOpen }) => {
             />
           </div>
 
-          <div className="flex flex-col w-1/2 justify-between">
+          <div className="flex flex-col w-2/3 justify-between">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 p-4">
                 <Link>
@@ -47,7 +47,7 @@ const CommentDialog = ({ open, setOpen }) => {
                   <Link className="font-semibold text-xs">
                     {selectedPost?.author.username}
                   </Link>
-                  {/* <span className="text-gray-600 text-sm">Bio here ...</span> */}
+            
                 </div>
               </div>
 
