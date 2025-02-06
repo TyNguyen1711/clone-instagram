@@ -6,10 +6,11 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog.jsx";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { deletePostApi } from "@/services/api/post";
+import { commentPostApi, deletePostApi } from "@/services/api/post";
 import { setPosts } from "@/redux/postSlice.js";
 import { toast } from "sonner";
 import { likeOrDislikeHandler } from "@/services/api/post.js";
+import { setSelectedPost } from "@/redux/postSlice.js";
 const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
@@ -17,6 +18,8 @@ const Post = ({ post }) => {
   const { posts } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLike, setPostLike] = useState(post.likes.length);
+  const { selectedPost } = useSelector((state) => state.post);
+
   const dispatch = useDispatch();
   const handlerDeletePost = async () => {
     const response = await deletePostApi(post._id);
@@ -47,6 +50,23 @@ const Post = ({ post }) => {
       );
       dispatch(setPosts(updatePostsData));
       toast.success(response.message);
+    }
+  };
+  const commentHandler = async () => {
+    const response = await commentPostApi(post._id, text);
+    if (response.success) {
+      toast.success(response.message);
+      setText("");
+
+      const updatePostsData = posts.map((p) =>
+        p._id === post._id
+          ? {
+              ...p,
+              comments: [response.comment, ...p.comments],
+            }
+          : p
+      );
+      dispatch(setPosts(updatePostsData));
     }
   };
   return (
@@ -109,7 +129,10 @@ const Post = ({ post }) => {
 
             <MessageCircle
               className="cursor-pointer hover:text-gray-600"
-              onClick={() => setOpen(true)}
+              onClick={() => {
+                setOpen(true);
+                dispatch(setSelectedPost(post));
+              }}
             />
             <Send className="cursor-pointer hover:text-gray-600" />
           </div>
@@ -124,7 +147,7 @@ const Post = ({ post }) => {
           onClick={() => setOpen(true)}
           className="cursor-pointer text-sm text-gray-400"
         >
-          View all 10 comments
+          View all {post.comments.length} comments
         </span>
         <CommentDialog open={open} setOpen={setOpen} />
         <div className="flex my-2 items-center">
@@ -141,7 +164,14 @@ const Post = ({ post }) => {
             }}
             className="outline-none text-sm w-full"
           />
-          {text && <span className="text-[#3BADFB] mr-2">Post</span>}
+          {text && (
+            <span
+              onClick={commentHandler}
+              className="cursor-pointer text-[#3BADFB] mr-2"
+            >
+              Post
+            </span>
+          )}
         </div>
       </div>
     </div>

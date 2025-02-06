@@ -38,3 +38,15 @@ export const likeOrDislikeHandler = async (postId, action) => {
     throw error;
   }
 };
+
+export const commentPostApi = async (postId, content) => {
+  try {
+    const response = await axios.post(`/post/${postId}/comment`, {
+      text: content,
+    });
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};
