@@ -54,11 +54,11 @@ const CreatePost = ({ openCreatePost, setOpenCreatePost }) => {
         </DialogHeader>
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarImage src={user.profilePicture} alt="img" />
+            <AvatarImage src={user?.profilePicture} alt="img" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="font-semibold text-xs">{user.username}</h1>
+            <h1 className="font-semibold text-xs">{user?.username}</h1>
             <span className="text-gray-500 text-xs">Bio here...</span>
           </div>
         </div>

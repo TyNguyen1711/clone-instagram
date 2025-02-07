@@ -1,7 +1,8 @@
 import { setPosts } from "@/redux/postSlice.js";
 import { getAllPost } from "@/services/api/post.js";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const useGetAllPosts = () => {
   const dispatch = useDispatch();
