@@ -98,10 +98,13 @@ export const logout = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log("userId: ", userId);
-    const user = await User.findById({ _id: userId });
-    console.log("userId2: ", user);
-
+    const user = await User.findById({ _id: userId })
+      .select("-password")
+      .populate({
+        path: "posts",
+        createdAt: -1,
+      })
+      .populate("bookmarks");
     return res.status(200).json({
       success: true,
       user,
@@ -120,7 +123,6 @@ export const editProfile = async (req, res) => {
     if (profilePicture) {
       const fileUri = getDataUri(profilePicture);
       cloudResponse = await cloudinary.uploader.upload(fileUri);
-
     }
     const user = await User.findById({ _id: userId });
     if (!user) {

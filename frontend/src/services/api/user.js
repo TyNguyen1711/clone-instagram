@@ -7,7 +7,6 @@ export const registerApi = async ({ username, email, password }) => {
       email,
       password,
     });
-    console.log(1);
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);
@@ -42,7 +41,16 @@ export const logoutApi = async () => {
 export const suggestedUsersApi = async () => {
   try {
     const response = await axios.get("/user/suggested");
-    console.log("res: ", response);
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};
+
+export const getProfileApi = async (userId) => {
+  try {
+    const response = await axios.get(`user/${userId}/profile`);
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);
