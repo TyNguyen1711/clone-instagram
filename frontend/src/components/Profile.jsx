@@ -1,20 +1,25 @@
 import useGetUserProfile from "@/hooks/useGetUserProfile";
+import { IoHeartSharp } from "react-icons/io5";
 import React, { useEffect, useState } from "react";
+import { TbMessageCircle } from "react-icons/tb";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { AtSign } from "lucide-react";
+import { AtSign, Heart, MessageCircle } from "lucide-react";
 
 const Profile = () => {
   const params = useParams();
   const userId = params.id;
   useGetUserProfile(userId);
-  const isLoggedInUserProfile = false;
-  const isFollowing = false;
+
   const [activeTab, setActiveTab] = useState("posts");
-  const { userProfile } = useSelector((state) => state.auth);
+  const { user, userProfile } = useSelector((state) => state.auth);
+  const displayPosts =
+    activeTab === "posts" ? userProfile?.posts : userProfile?.bookmarks;
+  const isLoggedInUserProfile = user._id === userProfile._id;
+  const isFollowing = user.followers.find((id) => id === userProfile._id);
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };
@@ -34,9 +39,14 @@ const Profile = () => {
             <div className="flex gap-2">
               {isLoggedInUserProfile ? (
                 <>
-                  <Button variant="secondary" className="hover:bg-gray-200 h-8">
-                    Edit profile
-                  </Button>
+                  <Link to="/account/edit">
+                    <Button
+                      variant="secondary"
+                      className="hover:bg-gray-200 h-8"
+                    >
+                      Edit profile
+                    </Button>
+                  </Link>
                   <Button variant="secondary" className="hover:bg-gray-200 h-8">
                     View Archive
                   </Button>
@@ -98,7 +108,7 @@ const Profile = () => {
         </section>
       </div>
 
-      <div className="my-20 border-t-gray-200 border-t">
+      <div className="mt-10 mb-5 border-t-gray-200 border-t">
         <div className="flex items-center justify-center gap-20">
           <span
             onClick={() => {
@@ -149,6 +159,33 @@ const Profile = () => {
             TAGS
           </span>
         </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        {displayPosts.map((post, index) => {
+          return (
+            <div key={index} className="relative cursor-pointer group">
+              <img
+                src={post.image}
+                alt="img"
+                className="rounded-sm aspect-square object-cover w-full"
+              />
+              <div className="absolute inset-0 rounded flex items-center opacity-0 justify-center bg-black bg-opacity-50 group-hover:opacity-100 transitition-opacity duration-300">
+                <div className="flex items-center text-white gap-6">
+                  <button className="flex items-center gap-1">
+                    <IoHeartSharp size={25} />
+                    <span>{post?.likes.length}</span>
+                  </button>
+
+                  <button className="flex items-center gap-1">
+                    <MessageCircle className="fill-white" />
+                    <span>{post?.comments.length}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

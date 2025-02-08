@@ -57,3 +57,13 @@ export const getProfileApi = async (userId) => {
     throw error;
   }
 };
+
+export const editProfileApi = async (data) => {
+  try {
+    const response = await axios.post(`user/profile/edit`, data);
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};
