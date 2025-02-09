@@ -14,10 +14,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "@/redux/authSlice";
 import { setPosts } from "@/redux/postSlice";
 import { setSelectedPost } from "@/redux/postSlice";
+import { setSelectedUser } from "@/redux/authSlice";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
 const LeftSidebar = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user, selectedUser } = useSelector((state) => state.auth);
   const [openCreatePost, setOpenCreatePost] = useState(false);
 
   const sidebarItems = [
@@ -46,6 +47,7 @@ const LeftSidebar = () => {
       dispatch(setAuthUser(null));
       dispatch(setPosts([]));
       dispatch(setSelectedPost(null));
+      dispatch(setSelectedUser(null))
       navigate("/login");
     }
   };
@@ -60,9 +62,10 @@ const LeftSidebar = () => {
       handleCreatePost();
     } else if (textType === "Profile") {
       navigate(`/profile/${user._id}`);
-    }
-    else if (textType === "Home") {
-      navigate('/')
+    } else if (textType === "Home") {
+      navigate("/");
+    } else if (textType === "Messages") {
+      navigate("/chat");
     }
   };
   return (
