@@ -6,6 +6,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Profile from "./components/Profile.jsx";
 import EditProfile from "./components/EditProfile.jsx";
 import ChatPage from "./components/ChatPage.jsx";
+import { io } from "socket.io-client";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -39,6 +42,17 @@ const browserRouter = createBrowserRouter([
   },
 ]);
 function App() {
+  const user = useSelector((state) => state.auth);
+  useEffect(() => {
+    if (user) {
+      const socketio = io("http://localhost:8000", {
+        query: {
+          userId: user._id,
+        },
+        transports: ["Websocket"],
+      });
+    }
+  }, []);
   return (
     <>
       <RouterProvider router={browserRouter} />
