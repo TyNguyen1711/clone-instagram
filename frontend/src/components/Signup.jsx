@@ -37,7 +37,6 @@ const Signup = () => {
 
   const validateFields = (fieldName, value) => {
     let error = "";
-    console.log(fieldName, value);
     if (value == "") {
       error = "This field is require";
     } else if (fieldName == "username") {
@@ -71,7 +70,6 @@ const Signup = () => {
     e.preventDefault();
     if (validateForms()) {
       const response = await registerApi(input);
-      console.log("res: ", response);
       if (response.success) {
         toast.success(response.mes);
         setInput({

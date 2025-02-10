@@ -2,23 +2,31 @@ import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 // import { BookMark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
-import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
+import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog.jsx";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { commentPostApi, deletePostApi } from "@/services/api/post";
+import {
+  bookMarkApi,
+  commentPostApi,
+  deletePostApi,
+} from "@/services/api/post";
 import { setPosts } from "@/redux/postSlice.js";
 import { toast } from "sonner";
 import { likeOrDislikeHandler } from "@/services/api/post.js";
 import { setSelectedPost } from "@/redux/postSlice.js";
 import { Badge } from "./ui/badge";
+import { setAuthUser } from "@/redux/authSlice";
 const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const { posts } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
+  const [bookMarked, setBookMarked] = useState(
+    user?.bookmarks?.includes(post?._id)
+  );
   const [postLike, setPostLike] = useState(post.likes.length);
 
   const dispatch = useDispatch();
@@ -70,6 +78,25 @@ const Post = ({ post }) => {
       dispatch(setPosts(updatePostsData));
     }
   };
+  const handlerClickBookmark = async () => {
+    const response = await bookMarkApi(post?._id);
+
+    if (response.success) {
+      setBookMarked((prevBookmarked) => {
+        const newBookmarkData = prevBookmarked
+          ? (user.bookmarks || []).filter((item) => item !== post?._id)
+          : [...(user.bookmarks || []), post._id];
+
+        const newUserData = { ...user, bookmarks: newBookmarkData };
+        dispatch(setAuthUser(newUserData));
+
+        return !prevBookmarked;
+      });
+
+      toast.success(response.mes || "Updated bookmark!");
+    }
+  };
+
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
@@ -80,7 +107,9 @@ const Post = ({ post }) => {
           </Avatar>
           <h1>{post.author?.username}</h1>
           {post.author._id === user._id && (
-            <Badge className="bg-gray-100 rounded-xl" variant="destructive">Author</Badge>
+            <Badge className="bg-gray-100 rounded-xl" variant="destructive">
+              Author
+            </Badge>
           )}
         </div>
         <Dialog>
@@ -140,7 +169,12 @@ const Post = ({ post }) => {
             />
             <Send className="cursor-pointer hover:text-gray-600" />
           </div>
-          <Bookmark className="cursor-pointer hover:text-gray-600" />
+          <Bookmark
+            onClick={handlerClickBookmark}
+            className={`cursor-pointer hover:text-gray-600 ${
+              bookMarked ? "fill-black" : "fill-none"
+            }`}
+          />
         </div>
         <span className="font-medium block mb-2">{postLike} likes</span>
         <p>

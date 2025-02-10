@@ -19,10 +19,7 @@ const ChatPage = () => {
     try {
       if (textMessage.trim()) {
         const res = await sendMessageApi(textMessage, selectedUser?._id);
-        console.log("response: ", res);
         if (res.success) {
-          console.log("1: ", messages);
-          console.log("mesage: ")
           dispatch(setMessages([...messages, res.newMessage]));
           setTextMessage("");
         }

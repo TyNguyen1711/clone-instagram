@@ -50,3 +50,13 @@ export const commentPostApi = async (postId, content) => {
     throw error;
   }
 };
+
+export const bookMarkApi = async (postId) => {
+  try {
+    const response = await axios.post(`/post/${postId}/bookmark`, {});
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};

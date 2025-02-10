@@ -48,7 +48,6 @@ function App() {
   const { user } = useSelector((store) => store.auth);
   const { socket } = useSelector((store) => store.socketio);
   const dispatch = useDispatch();
-  console.log("user: ", user);
   useEffect(() => {
     if (user) {
       const socketio = io("http://localhost:8000", {
@@ -60,7 +59,6 @@ function App() {
       dispatch(setSocket(socketio));
 
       socketio.on("getOnlineUsers", (onlineUsers) => {
-        console.log("online", onlineUsers);
         dispatch(setOnlineUsers(onlineUsers));
       });
       socketio.on("notification", (notification) => {

@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { logoutApi } from "@/services/api/user.js";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setAuthUser } from "@/redux/authSlice";
+import { setAuthUser, setUserProfile } from "@/redux/authSlice";
 import { setPosts } from "@/redux/postSlice";
 import { setSelectedPost } from "@/redux/postSlice";
 import { setSelectedUser } from "@/redux/authSlice";
@@ -46,8 +46,9 @@ const LeftSidebar = () => {
     if (response.success) {
       dispatch(setAuthUser(null));
       dispatch(setPosts([]));
+      dispatch(setUserProfile(null));
       dispatch(setSelectedPost(null));
-      dispatch(setSelectedUser(null))
+      dispatch(setSelectedUser(null));
       navigate("/login");
     }
   };
@@ -55,7 +56,6 @@ const LeftSidebar = () => {
     setOpenCreatePost(true);
   };
   const sidebarHandler = async (textType) => {
-    console.log(textType);
     if (textType === "Logout") {
       handleLogout();
     } else if (textType === "Create") {

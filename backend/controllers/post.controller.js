@@ -265,7 +265,7 @@ export const bookmarkPost = async (req, res) => {
       await user.updateOne({ $pull: { bookmarks: post._id } });
       await user.save();
       return res.status(200).json({
-        success: false,
+        success: true,
         type: "unsave",
         mes: "Post bookmark",
       });

@@ -54,19 +54,21 @@ export const login = async (req, res) => {
         mes: "Password incorrect!",
       });
     }
-    user = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      profilePicture: user.profilePicture,
-      bio: user.bio,
-      followers: user.followers,
-      following: user.following,
-      posts: user.posts,
-    };
+    // user = {
+    //   _id: user._id,
+    //   username: user.username,
+    //   email: user.email,
+    //   profilePicture: user.profilePicture,
+    //   bio: user.bio,
+    //   followers: user.followers,
+    //   following: user.following,
+    //   posts: user.posts,
+    // };
     const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
+
+    delete user["password"];
     return res
       .cookie("token", token, {
         httpOnly: true,
@@ -104,7 +106,11 @@ export const getProfile = async (req, res) => {
         path: "posts",
         createdAt: -1,
       })
-      .populate("bookmarks");
+      .populate({
+        path: "bookmarks",
+        model: "Post",
+      });
+
     return res.status(200).json({
       success: true,
       user,
