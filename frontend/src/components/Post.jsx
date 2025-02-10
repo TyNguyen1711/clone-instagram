@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { BookMarked, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+// import { BookMark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog.jsx";
 import { Button } from "./ui/button";
@@ -133,14 +134,13 @@ const Post = ({ post }) => {
             <MessageCircle
               className="cursor-pointer hover:text-gray-600"
               onClick={() => {
-                console.log(199);
                 setOpen(true);
                 dispatch(setSelectedPost(post));
               }}
             />
             <Send className="cursor-pointer hover:text-gray-600" />
           </div>
-          <BookMarked className="cursor-pointer hover:text-gray-600" />
+          <Bookmark className="cursor-pointer hover:text-gray-600" />
         </div>
         <span className="font-medium block mb-2">{postLike} likes</span>
         <p>

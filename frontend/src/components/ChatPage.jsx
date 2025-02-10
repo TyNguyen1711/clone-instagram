@@ -1,16 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { setSelectedUser } from "@/redux/authSlice.js";
 import { LuMessageCircleCode } from "react-icons/lu";
 import { Button } from "./ui/button";
+import { sendMessageApi } from "@/services/api/message.js";
+import { setMessages } from "@/redux/chatSlice";
 import Message from "./Message";
 const ChatPage = () => {
+  const [textMessage, setTextMessage] = useState("");
   const { user, suggestedUsers, selectedUser } = useSelector(
     (state) => state.auth
   );
+  const { messages } = useSelector((state) => state.chat);
   const dispatch = useDispatch();
   const { onlineUsers } = useSelector((state) => state.chat);
+  const sendMessageHandler = async () => {
+    try {
+      if (textMessage.trim()) {
+        const res = await sendMessageApi(textMessage, selectedUser?._id);
+        console.log("response: ", res);
+        if (res.success) {
+          console.log("1: ", messages);
+          console.log("mesage: ")
+          dispatch(setMessages([...messages, res.newMessage]));
+          setTextMessage("");
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+  useEffect(() => {
+    dispatch(setSelectedUser(null))
+  }, []);
   return (
     <div className="h-screen ml-[16%] flex">
       <section className="w-full md:w-1/4 py-4">
@@ -19,10 +42,7 @@ const ChatPage = () => {
         <div className="h-[80vh] overflow-y-auto">
           {suggestedUsers &&
             suggestedUsers.map((suggestedUser, index) => {
-              console.log("sug: ", suggestedUser._id)
-              console.log("one: ", onlineUsers)
               const isOnline = onlineUsers.includes(suggestedUser?._id);
-              console.log("isonline: ", isOnline)
               return (
                 <div
                   onClick={() => dispatch(setSelectedUser(suggestedUser))}
@@ -62,14 +82,16 @@ const ChatPage = () => {
             </Avatar>
             <div>{selectedUser?.username}</div>
           </div>
-          <Message selectedUser={selectedUser} />
+          {selectedUser && <Message selectedUser={selectedUser} />}
           <div className="flex items-center p-2">
             <input
+              value={textMessage}
+              onChange={(e) => setTextMessage(e.target.value)}
               type="text"
               placeholder="Messages ..."
               className="flex-1 p-2 mr-3 border border-gray-200 rounded focus-visible:ring-transparent outline-none"
             />
-            <Button>Send</Button>
+            <Button onClick={() => sendMessageHandler()}>Send</Button>
           </div>
         </section>
       ) : (

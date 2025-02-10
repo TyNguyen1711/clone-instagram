@@ -4,6 +4,7 @@ import cloudinary from "../config/cloudinary.js";
 
 import { User } from "../models/user.model.js";
 import { Comment } from "../models/comment.model.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 export const addNewPost = async (req, res) => {
   try {
     const { caption } = req.body;
@@ -31,7 +32,7 @@ export const addNewPost = async (req, res) => {
     }
 
     await post.populate({ path: "author", select: "-password" });
-    console.log("test: ", post)
+    console.log("test: ", post);
     return res.status(201).json({
       message: "New post added",
       post,
@@ -102,6 +103,21 @@ export const likePost = async (req, res) => {
     }
     await post.updateOne({ $addToSet: { likes: userId } });
     await post.save();
+    const userLike = await User.find({ _id: userId }).select(
+      "username profilePicture"
+    );
+    const postOwnerId = post.author.toString();
+    if (userLike !== postOwnerId) {
+      const notification = {
+        type: "like",
+        userId: userId,
+        userDetail: userLike,
+        postId: postId,
+        message: "Your post was liked",
+      };
+      const postSocketId = getReceiverSocketId(postOwnerId);
+      io.to(postSocketId).emit("notification", notification);
+    }
     return res.status(200).json({
       success: true,
       message: "post liked successfully",
@@ -123,6 +139,21 @@ export const dislikePost = async (req, res) => {
     }
     await post.updateOne({ $pull: { likes: userId } });
     await post.save();
+    const userDislike = await User.find({ _id: userId }).select(
+      "username profilePicture"
+    );
+    const postOwnerId = post.author.toString();
+    if (userDislike !== postOwnerId) {
+      const notification = {
+        type: "dislike",
+        userId: userId,
+        userDetail: userLike,
+        postId: postId,
+        message: "Your post was disliked",
+      };
+      const postSocketId = getReceiverSocketId(postOwnerId);
+      io.to(postSocketId).emit("notification", notification);
+    }
     return res.status(200).json({
       success: true,
       message: "post disliked successfully",
