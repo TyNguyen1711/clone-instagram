@@ -18,8 +18,8 @@ const Profile = () => {
   const { user, userProfile } = useSelector((state) => state.auth);
   const displayPosts =
     activeTab === "posts" ? userProfile?.posts : userProfile?.bookmarks;
-  const isLoggedInUserProfile = user._id === userProfile._id;
-  const isFollowing = user.followers.find((id) => id === userProfile._id);
+  const isLoggedInUserProfile = user?._id === userProfile?._id;
+  const isFollowing = user?.followers.find((id) => id === userProfile?._id);
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };
@@ -29,7 +29,7 @@ const Profile = () => {
       <div className="grid grid-cols-2 pt-8">
         <section className="flex items-center justify-center">
           <Avatar className="w-36 h-36">
-            <AvatarImage src={userProfile.profilePicture} alt="img" />
+            <AvatarImage src={userProfile?.profilePicture} alt="img" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
         </section>
@@ -162,7 +162,7 @@ const Profile = () => {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {displayPosts.map((post, index) => {
+        {displayPosts?.map((post, index) => {
           return (
             <div key={index} className="relative cursor-pointer group">
               <img

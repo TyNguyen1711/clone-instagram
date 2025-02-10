@@ -12,15 +12,18 @@ import storage from "redux-persist/lib/storage";
 import authSlice from "./authSlice.js";
 import postSlice from "./postSlice.js";
 import socketSlice from "./socketSlice.js";
+import chatSlice from "./chatSlice.js";
 const persistConfig = {
   key: "root",
   version: 1,
   storage,
+  blacklist: ["socketio"],
 };
 const rootReducer = combineReducers({
   auth: authSlice,
   post: postSlice,
   socketio: socketSlice,
+  chat: chatSlice,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 const store = configureStore({
@@ -28,7 +31,16 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+          "socketio/setSocket",
+        ],
+        ignoredPaths: ["socketio.socket"],
       },
     }),
 });
