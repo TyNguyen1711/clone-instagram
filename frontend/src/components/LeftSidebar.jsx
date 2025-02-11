@@ -17,6 +17,7 @@ import { setSelectedPost } from "@/redux/postSlice";
 import { setSelectedUser } from "@/redux/authSlice";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
+import { setMessages } from "@/redux/chatSlice";
 const LeftSidebar = () => {
   const { user, selectedUser } = useSelector((state) => state.auth);
   const [openCreatePost, setOpenCreatePost] = useState(false);
@@ -49,6 +50,7 @@ const LeftSidebar = () => {
       dispatch(setUserProfile(null));
       dispatch(setSelectedPost(null));
       dispatch(setSelectedUser(null));
+      dispatch(setMessages([]));
       navigate("/login");
     }
   };

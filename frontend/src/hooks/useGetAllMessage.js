@@ -14,7 +14,7 @@ const useGetAllMessage = async () => {
         }
       };
       fetchMessage();
-    }, []);
+    }, [selectedUser]);
   } catch (error) {
     throw error;
   }
