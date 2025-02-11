@@ -14,16 +14,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser, setUserProfile } from "@/redux/authSlice";
 import { setPosts } from "@/redux/postSlice";
 import { setSelectedPost } from "@/redux/postSlice";
+import { GoHome, GoHomeFill } from "react-icons/go";
 import { setSelectedUser } from "@/redux/authSlice";
+import { LogoInstagramIcon } from "./icon/index.jsx";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
 import { setMessages } from "@/redux/chatSlice";
 const LeftSidebar = () => {
   const { user, selectedUser } = useSelector((state) => state.auth);
   const [openCreatePost, setOpenCreatePost] = useState(false);
-
+  const [type, setType] = useState("Home");
   const sidebarItems = [
-    { icon: <Home />, text: "Home" },
+    {
+      icon: type === "Home" ? <GoHomeFill size={24} /> : <GoHome size={24} />,
+      text: "Home",
+    },
     { icon: <Search />, text: "Search" },
     { icon: <TrendingUp />, text: "Explore" },
     { icon: <MessageCircle />, text: "Messages" },
@@ -58,6 +63,7 @@ const LeftSidebar = () => {
     setOpenCreatePost(true);
   };
   const sidebarHandler = async (textType) => {
+    setType(textType);
     if (textType === "Logout") {
       handleLogout();
     } else if (textType === "Create") {
@@ -73,16 +79,18 @@ const LeftSidebar = () => {
   return (
     <div className="fixed top-0 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
       <div>
-        <h1 className="font-bold my-4 ml-5 text-xl mb-4">LOGO</h1>
+        <LogoInstagramIcon />
         <div>
           {sidebarItems.map((item, index) => {
             return (
               <div
                 key={index}
-                className="flex items-center p-5 hover:bg-gray-100 cursor-pointer"
+                className={`flex items-center px-5 py-5 hover:bg-gray-100 cursor-pointer rounded ${
+                  item.text === type ? "font-bold" : ""
+                }`}
                 onClick={() => sidebarHandler(item.text)}
               >
-                <div className="mr-2">{item.icon}</div>
+                <div className={`mr-2`}>{item.icon}</div>
                 <div>{item.text}</div>
               </div>
             );

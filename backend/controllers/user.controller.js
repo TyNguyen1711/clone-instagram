@@ -194,11 +194,11 @@ export const followingOrUnfollow = async (req, res) => {
       await Promise.all([
         User.updateOne(
           { _id: followerId },
-          { $pull: { following: followerId } }
+          { $pull: { following: followingId } }
         ),
         User.updateOne(
           { _id: followingId },
-          { $pull: { followers: followingId } }
+          { $pull: { followers: followerId } }
         ),
       ]);
       return res.status(200).json({
@@ -209,11 +209,11 @@ export const followingOrUnfollow = async (req, res) => {
       await Promise.all([
         User.updateOne(
           { _id: followerId },
-          { $push: { following: followerId } }
+          { $push: { following: followingId } }
         ),
         User.updateOne(
           { _id: followingId },
-          { $push: { followers: followingId } }
+          { $push: { followers: followerId } }
         ),
       ]);
       return res.status(200).json({

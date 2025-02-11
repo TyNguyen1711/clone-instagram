@@ -67,3 +67,13 @@ export const editProfileApi = async (data) => {
     throw error;
   }
 };
+
+export const followOrUnfollowApi = async (userId) => {
+  try {
+    const response = await axios.post(`/user/follow-or-unfollow/${userId}`, {});
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};

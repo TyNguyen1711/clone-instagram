@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "react-router-dom";
 import { MoreHorizontal } from "lucide-react";
@@ -61,7 +61,7 @@ const CommentDialog = ({ open, setOpen }) => {
             {selectedPost?.type === "image" ? (
               <img
                 className="w-full h-full object-cover rounded-l-lg"
-                src={selectedPost?.image}
+                src={selectedPost?.srcURL}
                 alt="post"
               />
             ) : (

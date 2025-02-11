@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import useGetAllMessage from "@/hooks/useGetAllMessage.js";
 import { useSelector } from "react-redux";
 import useGetRTM from "@/hooks/useGetRTM.js";
+import { useNavigate } from "react-router-dom";
 const Message = ({ selectedUser }) => {
   if (selectedUser) {
     useGetAllMessage();
@@ -11,6 +12,7 @@ const Message = ({ selectedUser }) => {
   }
   const { messages } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col py-4">
       <div className="flex flex-col items-center justify-center gap-2">
@@ -19,7 +21,11 @@ const Message = ({ selectedUser }) => {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>{selectedUser?.username}</div>
-        <Button variant="ghost" className="bg-gray-100 h-8">
+        <Button
+          variant="ghost"
+          className="bg-gray-100 h-8"
+          onClick={() => navigate(`/profile/${selectedUser?._id}`)}
+        >
           View profile
         </Button>
       </div>

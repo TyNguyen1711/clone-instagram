@@ -2,12 +2,15 @@ import useGetUserProfile from "@/hooks/useGetUserProfile";
 import { IoHeartSharp } from "react-icons/io5";
 import React, { useEffect, useState } from "react";
 import { TbMessageCircle } from "react-icons/tb";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { AtSign, Heart, MessageCircle } from "lucide-react";
+import { followOrUnfollowApi } from "@/services/api/user";
+import { toast } from "sonner";
+import { setAuthUser, setUserProfile } from "@/redux/authSlice";
 
 const Profile = () => {
   const params = useParams();
@@ -19,11 +22,45 @@ const Profile = () => {
   const displayPosts =
     activeTab === "posts" ? userProfile?.posts : userProfile?.bookmarks;
   const isLoggedInUserProfile = user?._id === userProfile?._id;
-  const isFollowing = user?.followers.find((id) => id === userProfile?._id);
+  const [isFollowing, setFollowing] = useState(
+    user?.following.find((id) => id === userProfile?._id)
+  );
+  const dispatch = useDispatch();
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };
+  const handleFollowUnfollowUser = async () => {
+    try {
+      const response = await followOrUnfollowApi(userProfile?._id);
+      console.log("response", response);
+      if (response.success) {
+        if (isFollowing) {
+          const updateFollowers = userProfile?.followers.filter(
+            (follower) => follower !== user._id
+          );
+          const updateFollowings = user?.following.filter(
+            (following) => following !== userProfile._id
+          );
+          dispatch(
+            setUserProfile({ ...userProfile, followers: updateFollowers })
+          );
+          dispatch(setAuthUser({ ...user, following: updateFollowings }));
+        } else {
+          const updateFollowers = [...userProfile?.followers, user._id];
+          const updateFollowings = [...user.following, userProfile._id];
+          dispatch(
+            setUserProfile({ ...userProfile, followers: updateFollowers })
+          );
+          dispatch(setAuthUser({ ...user, following: updateFollowings }));
+        }
+        setFollowing(!isFollowing);
 
+        toast.success(response.mes);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
   return (
     <div className="max-w-5xl mx-auto pl-20 justify-center">
       <div className="grid grid-cols-2 pt-8">
@@ -57,7 +94,11 @@ const Profile = () => {
               ) : isFollowing ? (
                 <>
                   {" "}
-                  <Button variant="secondary" className="h-8">
+                  <Button
+                    onClick={handleFollowUnfollowUser}
+                    variant="secondary"
+                    className="h-8"
+                  >
                     Unfollow
                   </Button>
                   <Button variant="secondary" className="h-8">
@@ -65,12 +106,18 @@ const Profile = () => {
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="secondary"
-                  className="bg-[#0095F6] hover:bg-[#3192d2] h-8 text-[#FFFFFF]"
-                >
-                  Follow
-                </Button>
+                <>
+                  <Button
+                    variant="secondary"
+                    className="bg-[#0095F6] hover:bg-[#3192d2] h-8 text-[#FFFFFF]"
+                    onClick={handleFollowUnfollowUser}
+                  >
+                    Follow
+                  </Button>
+                  <Button variant="secondary" className="h-8">
+                    Message
+                  </Button>
+                </>
               )}
             </div>
           </div>
