@@ -165,11 +165,17 @@ const Profile = () => {
         {displayPosts?.map((post, index) => {
           return (
             <div key={index} className="relative cursor-pointer group">
-              <img
-                src={post.image}
-                alt="img"
-                className="rounded-sm aspect-square object-cover w-full"
-              />
+              {post?.type === "image" ? (
+                <img
+                  src={post.srcURL}
+                  alt="img"
+                  className="rounded-sm aspect-square object-cover w-full"
+                />
+              ) : (
+                <video className="rounded-sm w-full" controls>
+                  <source src={post?.srcURL} type="video/mp4" />
+                </video>
+              )}
               <div className="absolute inset-0 rounded flex items-center opacity-0 justify-center bg-black bg-opacity-50 group-hover:opacity-100 transitition-opacity duration-300">
                 <div className="flex items-center text-white gap-6">
                   <button className="flex items-center gap-1">

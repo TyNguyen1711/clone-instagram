@@ -4,9 +4,15 @@ const postSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
-  image: {
+  srcURL: {
     type: String,
     default: "",
+    require: true,
+  },
+  type: {
+    type: String,
+    enum: ["image", "video"],
+    require: true
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,

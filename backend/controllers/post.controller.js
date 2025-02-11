@@ -5,41 +5,53 @@ import cloudinary from "../config/cloudinary.js";
 import { User } from "../models/user.model.js";
 import { Comment } from "../models/comment.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
+import uploadVideoToCloudinary from "../util/uploadVideoToCloudinary.js";
 export const addNewPost = async (req, res) => {
   try {
     const { caption } = req.body;
-    const image = req.file;
-    const authorId = req.id;
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: "File is required" });
 
-    if (!image) return res.status(400).json({ message: "Image required" });
+    let type = file.mimetype.startsWith("image/") ? "image" : "video";
+    let cloudResponse;
 
-    const optimizedImageBuffer = await sharp(image.buffer)
-      .resize({ width: 800, height: 800, fit: "inside" })
-      .toBuffer();
-    const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
-      "base64"
-    )}`;
-    const cloudResponse = await cloudinary.uploader.upload(fileUri);
-    const post = await Post.create({
-      caption,
-      image: cloudResponse.secure_url,
-      author: authorId,
-    });
-    const user = await User.findById(authorId);
-    if (user) {
-      user.posts.push(post._id);
-      await user.save();
+    if (type === "image") {
+      const optimizedImageBuffer = await sharp(file.buffer)
+        .resize({ width: 800, height: 800, fit: "inside" })
+        .toBuffer();
+      const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
+        "base64"
+      )}`;
+      cloudResponse = await cloudinary.uploader.upload(fileUri, {
+        folder: "posts/images",
+      });
+    } else {
+      cloudResponse = await uploadVideoToCloudinary(file);
     }
 
+    if (!cloudResponse || !cloudResponse.secure_url) {
+      return res.status(500).json({ message: "Upload failed" });
+    }
+
+    const post = await Post.create({
+      caption,
+      srcURL: cloudResponse.secure_url,
+      author: req.id,
+      type,
+    });
+
+    await User.findByIdAndUpdate(req.id, { $push: { posts: post._id } });
+
     await post.populate({ path: "author", select: "-password" });
-    console.log("test: ", post);
-    return res.status(201).json({
+
+    res.status(201).json({
       message: "New post added",
       post,
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error:", error);
+    res.status(500).json({ message: "Server error", error });
   }
 };
 export const getAllPost = async (req, res) => {

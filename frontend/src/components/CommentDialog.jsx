@@ -58,11 +58,18 @@ const CommentDialog = ({ open, setOpen }) => {
         {/* Rest of your component remains the same */}
         <div className="flex flex-1">
           <div>
-            <img
-              className="w-full h-full object-cover rounded-l-lg"
-              src={selectedPost?.image}
-              alt="post"
-            />
+            {selectedPost?.type === "image" ? (
+              <img
+                className="w-full h-full object-cover rounded-l-lg"
+                src={selectedPost?.image}
+                alt="post"
+              />
+            ) : (
+              <video className="w-full p-1" controls>
+                <source src={selectedPost?.srcURL} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            )}
           </div>
 
           <div className="flex flex-col w-2/3 justify-between">

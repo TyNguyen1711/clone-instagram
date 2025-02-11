@@ -141,11 +141,18 @@ const Post = ({ post }) => {
           </DialogContent>
         </Dialog>
       </div>
-      <img
-        className="rounded-sm my-2 w-full aspect-square object-cover object-center"
-        src={post?.image}
-        alt=""
-      />
+      {post?.type === "image" ? (
+        <img
+          className="rounded-sm my-2 w-full aspect-square object-cover object-center"
+          src={post?.srcURL}
+          alt=""
+        />
+      ) : (
+        <video className="w-full h-full rounded-md my-2" controls>
+          <source src={post?.srcURL} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      )}
       <div>
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
