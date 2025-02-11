@@ -147,7 +147,7 @@ export const dislikePost = async (req, res) => {
       const notification = {
         type: "dislike",
         userId: userId,
-        userDetail: userLike,
+        userDetail: userDislike,
         postId: postId,
         message: "Your post was disliked",
       };
