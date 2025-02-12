@@ -55,21 +55,24 @@ export const login = async (req, res) => {
         mes: "Password incorrect!",
       });
     }
-    // user = {
-    //   _id: user._id,
-    //   username: user.username,
-    //   email: user.email,
-    //   profilePicture: user.profilePicture,
-    //   bio: user.bio,
-    //   followers: user.followers,
-    //   following: user.following,
-    //   posts: user.posts,
-    // };
+
     const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
 
     delete user["password"];
+    user = await user.populate({
+      path: "searchHistory",
+      select: "username bio followers profilePicture isUserBlue",
+      transform: (doc) => ({
+        _id: doc._id,
+        username: doc.username,
+        bio: doc.bio,
+        countFollowers: doc.followers.length,
+        profilePicture: doc.profilePicture,
+        isUserBlue: doc.isUserBlue,
+      }),
+    });
     return res
       .cookie("token", token, {
         httpOnly: true,
@@ -274,17 +277,17 @@ export const addUserToHistorySearch = async (req, res) => {
     const userId = req.id;
     const user = await User.findOne({ _id: userId });
     const searchUserId = req.body.searchUserId;
-    const index = user.historySearch.indexOf(searchUserId);
+    if (!user?.searchHistory) {
+      user.searchHistory = [];
+    }
+    const index = user?.searchHistory.indexOf(searchUserId);
 
     if (index !== -1) {
-      user.historySearch.splice(index, 1);
+      user.searchHistory.splice(index, 1);
     }
 
-    user.historySearch.unshift(searchUserId);
+    user.searchHistory.unshift(searchUserId);
 
-    if (user.historySearch.length > 10) {
-      user.historySearch.pop();
-    }
     await user.save();
     return res.status(200).json({
       success: true,
@@ -300,10 +303,10 @@ export const deleteUserFromHistoryUserSearch = async (req, res) => {
     const userId = req.id;
     const user = await User.findOne({ _id: userId });
     const searchUserId = req.body.searchUserId;
-    const updateHistorySearch = user.historySearch.filter(
+    const updateHistorySearch = user.searchHistory.filter(
       (id) => id !== searchUserId
     );
-    user.historySearch = updateHistorySearch;
+    user.searchHistory = updateHistorySearch;
     await user.save();
     return res.status(200).json({
       success: true,
@@ -318,7 +321,7 @@ export const deleteAllHistorySearch = async (req, res) => {
   try {
     const userId = req.id;
     const user = await User.findOne({ _id: userId });
-    user.historySearch = [];
+    user.searchHistory = [];
     await user.save();
     return res.status(200).json({
       success: true,

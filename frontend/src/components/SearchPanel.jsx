@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search as SearchIcon, X, Check } from "lucide-react";
-import { searchUserApi } from "@/services/api/user";
+import {
+  addUserToHistorySearchApi,
+  deleteAllHistorySearchApi,
+  deleteUserFromHistorySearchApi,
+  searchUserApi,
+} from "@/services/api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setUserProfile } from "@/redux/authSlice";
@@ -14,56 +19,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const bufferUser = user;
-  const [recentSearches] = useState([
-    {
-      id: 1,
-      username: "wag",
-      name: "The #1 App for Pet Parents",
-      followers: "131K followers",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-    {
-      id: 2,
-      username: "keria_minseok",
-      name: "류민석",
-      status: "Following",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-    {
-      id: 3,
-      username: "t1_oner",
-      name: "현준",
-      status: "Following",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-    {
-      id: 4,
-      username: "t1_gumayusi",
-      name: "이민형",
-      status: "Following",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-    {
-      id: 5,
-      username: "cristiano",
-      name: "Cristiano Ronaldo",
-      followers: "649M followers",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-    {
-      id: 6,
-      username: "faker",
-      name: "Faker(페이커)",
-      status: "Following",
-      verified: true,
-      avatar: "/api/placeholder/32/32",
-    },
-  ]);
+  const [recentSearches, setRecenteSearches] = useState(user?.searchHistory);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchDataSearch = async () => {
@@ -77,8 +33,17 @@ const SearchPanel = ({ isOpen, onClose }) => {
   }, [searchQuery]);
   if (!isOpen) return null;
   const handlerClickUser = async (userId) => {
+    const response = await addUserToHistorySearchApi(userId);
     onClose();
     navigate(`/profile/${userId}`);
+  };
+  const handlerClickDelete = async (userId) => {
+    const response = await deleteUserFromHistorySearchApi(userId);
+    console.log("response: ", response);
+  };
+  const handlerClickDeleteAll = async () => {
+    const response = await deleteAllHistorySearchApi();
+    console.log("response: ", response);
   };
   return (
     <div className="fixed top-0 left-[73px] w-[397px] h-screen bg-white border-r border-gray-200 z-50">
@@ -111,13 +76,19 @@ const SearchPanel = ({ isOpen, onClose }) => {
               <>
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-semibold">Recent</h3>
-                  <button className="text-blue-500 text-sm font-medium">
+                  <button
+                    onClick={handlerClickDeleteAll}
+                    className="text-blue-500 text-sm font-medium"
+                  >
                     Clear all
                   </button>
                 </div>
-                {recentSearches.map((user) => (
+                {recentSearches?.map((user) => (
                   <div
-                    key={user.id}
+                    key={user._id}
+                    onClick={() => {
+                      handlerClickUser(user._id);
+                    }}
                     className="flex items-center justify-between py-2 hover:bg-gray-100 rounded-lg cursor-pointer group px-2"
                   >
                     <div className="flex items-center gap-3">
@@ -135,18 +106,21 @@ const SearchPanel = ({ isOpen, onClose }) => {
                           <span className="font-semibold text-sm">
                             {user.username}
                           </span>
-                          {user.verified && (
+                          {user.isUserBlue && (
                             <div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center">
                               <Check className="w-2.5 h-2.5 text-white" />
                             </div>
                           )}
                         </div>
                         <p className="text-gray-500 text-sm">
-                          {user.name}
-                          {(user.status || user.followers) && " • "}
-                          <span className="text-gray-400">
-                            {user.status || user.followers}
-                          </span>
+                          {(user.bio || "Bio here ...") + " • "}
+                          {bufferUser?.following.includes(user._id) ? (
+                            <span className="text-gray-400">Following</span>
+                          ) : (
+                            <span className="text-gray-400">
+                              {user.countFollowers} followers
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -154,9 +128,14 @@ const SearchPanel = ({ isOpen, onClose }) => {
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
-                      className="p-2 hover:bg-gray-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="p-2 hover:bg-gray-200 rounded-full transition-opacity"
                     >
-                      <X className="h-4 w-4 text-gray-500" />
+                      <X
+                        onClick={() => {
+                          handlerClickDelete(user._id);
+                        }}
+                        className="h-6 w-6 text-gray-700"
+                      />
                     </button>
                   </div>
                 ))}
