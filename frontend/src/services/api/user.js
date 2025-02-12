@@ -77,3 +77,12 @@ export const followOrUnfollowApi = async (userId) => {
     throw error;
   }
 };
+
+export const searchUserApi = async (query) => {
+  try {
+    const response = await axios.get(`/user/search?search=${query}`)
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+}

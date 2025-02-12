@@ -3,14 +3,18 @@ import { IoHeartSharp } from "react-icons/io5";
 import React, { useEffect, useState } from "react";
 import { TbMessageCircle } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { AtSign, Heart, MessageCircle } from "lucide-react";
 import { followOrUnfollowApi } from "@/services/api/user";
 import { toast } from "sonner";
-import { setAuthUser, setUserProfile } from "@/redux/authSlice";
+import {
+  setAuthUser,
+  setSelectedUser,
+  setUserProfile,
+} from "@/redux/authSlice";
 
 const Profile = () => {
   const params = useParams();
@@ -29,6 +33,7 @@ const Profile = () => {
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };
+  const navigate = useNavigate();
   const handleFollowUnfollowUser = async () => {
     try {
       const response = await followOrUnfollowApi(userProfile?._id);
@@ -60,6 +65,11 @@ const Profile = () => {
     } catch (error) {
       throw error;
     }
+  };
+  const handlerClickMessage = () => {
+    console.log("111: ", userProfile)
+    dispatch(setSelectedUser(userProfile));
+    navigate("/chat");
   };
   return (
     <div className="max-w-5xl mx-auto pl-20 justify-center">
@@ -101,7 +111,11 @@ const Profile = () => {
                   >
                     Unfollow
                   </Button>
-                  <Button variant="secondary" className="h-8">
+                  <Button
+                    onClick={handlerClickMessage}
+                    variant="secondary"
+                    className="h-8"
+                  >
                     Message
                   </Button>
                 </>
@@ -114,7 +128,11 @@ const Profile = () => {
                   >
                     Follow
                   </Button>
-                  <Button variant="secondary" className="h-8">
+                  <Button
+                    onClick={handlerClickMessage}
+                    variant="secondary"
+                    className="h-8"
+                  >
                     Message
                   </Button>
                 </>

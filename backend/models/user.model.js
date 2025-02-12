@@ -48,6 +48,17 @@ const UserSchema = new mongoose.Schema(
         ref: "Post",
       },
     ],
+    isUserBlue: {
+      type: Boolean,
+      default: false,
+    },
+    searchHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
   },
   { timestamps: true }
 );

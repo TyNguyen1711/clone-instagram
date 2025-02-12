@@ -7,6 +7,7 @@ import {
   login,
   logout,
   register,
+  searchUser,
 } from "../controllers/user.controller.js";
 import isAuthenticated from "../middlewares/authenticated.js";
 import upload from "../middlewares/multer.js";
@@ -23,6 +24,5 @@ router.route("/suggested").get(isAuthenticated, getSuggestedUsers);
 router
   .route("/follow-or-unfollow/:id")
   .post(isAuthenticated, followingOrUnfollow);
-
+router.route("/search").get(isAuthenticated, searchUser);
 export default router;
-    

@@ -3,6 +3,7 @@ import brcypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../util/datauri.js";
 import cloudinary from "../config/cloudinary.js";
+import Fuse from "fuse.js";
 export const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -221,6 +222,48 @@ export const followingOrUnfollow = async (req, res) => {
         mes: "Follow successfully",
       });
     }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const searchUser = async (req, res) => {
+  try {
+    const userId = req.id;
+    const query = req.query.search;
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing input",
+      });
+    }
+    let users = await User.find({
+      username: { $regex: query, $options: "i" },
+      _id: { $ne: userId },
+    })
+      .select("username bio isUserBlue followers")
+      .limit(5);
+    if (users.length < 5) {
+      const allUser = await User.find({
+        _id: { $ne: userId },
+      });
+
+      const fuse = new Fuse(allUser, {
+        keys: ["username"],
+        threshold: 0.4,
+        distance: 100,
+      });
+      const fuzzyResults = fuse.search(query).map((result) => result.item);
+      const additionalUsers = fuzzyResults
+        .filter((u) => !users.some((user) => user._id.equals(u._id)))
+        .slice(0, 5 - users.length);
+
+      users = [...users, ...additionalUsers];
+    }
+    return res.status(200).json({
+      success: false,
+      users,
+    });
   } catch (error) {
     throw error;
   }
