@@ -80,9 +80,45 @@ export const followOrUnfollowApi = async (userId) => {
 
 export const searchUserApi = async (query) => {
   try {
-    const response = await axios.get(`/user/search?search=${query}`)
+    const response = await axios.get(`/user/search?search=${query}`);
+    return response;
   } catch (error) {
     toast.error(error.response.data.mes);
     throw error;
   }
-}
+};
+
+export const addUserToHistorySearchApi = async (userId) => {
+  try {
+    const response = await axios.post("/user/history-search/add", {
+      searchUserId: userId,
+    });
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};
+
+export const deleteUserFromHistorySearchApi = async (userId) => {
+  try {
+    const response = await axios.delete("/user/history-search/delete", {
+      searchUserId: userId,
+    });
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};
+
+export const deleteAllHistorySearchApi = async () => {
+  try {
+    const response = await axios.delete("/user/history-search/delete-all", {});
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+
+    throw error;
+  }
+};

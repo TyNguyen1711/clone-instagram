@@ -1,5 +1,8 @@
 import express from "express";
 import {
+  addUserToHistorySearch,
+  deleteAllHistorySearch,
+  deleteUserFromHistoryUserSearch,
   editProfile,
   followingOrUnfollow,
   getProfile,
@@ -25,4 +28,17 @@ router
   .route("/follow-or-unfollow/:id")
   .post(isAuthenticated, followingOrUnfollow);
 router.route("/search").get(isAuthenticated, searchUser);
+
+router
+  .route("/history-search/add")
+  .post(isAuthenticated, addUserToHistorySearch);
+
+router
+  .route("/history-search/delete")
+  .delete(isAuthenticated, deleteUserFromHistoryUserSearch);
+
+router
+  .route("/history-search/delete-all")
+  .delete(isAuthenticated, deleteAllHistorySearch);
+
 export default router;

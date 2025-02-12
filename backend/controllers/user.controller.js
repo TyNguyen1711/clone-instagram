@@ -241,7 +241,7 @@ export const searchUser = async (req, res) => {
       username: { $regex: query, $options: "i" },
       _id: { $ne: userId },
     })
-      .select("username bio isUserBlue followers")
+      .select("username bio isUserBlue followers profilePicture")
       .limit(5);
     if (users.length < 5) {
       const allUser = await User.find({
@@ -261,8 +261,68 @@ export const searchUser = async (req, res) => {
       users = [...users, ...additionalUsers];
     }
     return res.status(200).json({
-      success: false,
+      success: true,
       users,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const addUserToHistorySearch = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findOne({ _id: userId });
+    const searchUserId = req.body.searchUserId;
+    const index = user.historySearch.indexOf(searchUserId);
+
+    if (index !== -1) {
+      user.historySearch.splice(index, 1);
+    }
+
+    user.historySearch.unshift(searchUserId);
+
+    if (user.historySearch.length > 10) {
+      user.historySearch.pop();
+    }
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Add history search successfully",
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUserFromHistoryUserSearch = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findOne({ _id: userId });
+    const searchUserId = req.body.searchUserId;
+    const updateHistorySearch = user.historySearch.filter(
+      (id) => id !== searchUserId
+    );
+    user.historySearch = updateHistorySearch;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Delete history search successfully",
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteAllHistorySearch = async (req, res) => {
+  try {
+    const userId = req.id;
+    const user = await User.findOne({ _id: userId });
+    user.historySearch = [];
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "Delete all search history successfully",
     });
   } catch (error) {
     throw error;
