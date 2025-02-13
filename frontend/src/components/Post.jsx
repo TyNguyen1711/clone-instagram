@@ -193,7 +193,10 @@ const Post = ({ post }) => {
         </p>
         {post.comments.length > 0 && (
           <span
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              dispatch(setSelectedPost(post));
+              setOpen(true);
+            }}
             className="cursor-pointer text-sm text-gray-400"
           >
             View all {post.comments.length} comments

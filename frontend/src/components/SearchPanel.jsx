@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setAuthUser, setUserProfile } from "@/redux/authSlice";
+import { BlueCheck } from "./icon";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
 
 const SearchPanel = ({ isOpen, onClose }) => {
@@ -131,8 +132,8 @@ const SearchPanel = ({ isOpen, onClose }) => {
                             {user.username}
                           </span>
                           {user.isUserBlue && (
-                            <div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center">
-                              <Check className="w-2.5 h-2.5 text-white" />
+                            <div>
+                              <BlueCheck width="0.8rem" height="0.8rem" />
                             </div>
                           )}
                         </div>
@@ -192,7 +193,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
                             </span>
                             {user.isUserBlue && (
                               <div className="w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center">
-                                <Check className="w-2.5 h-2.5 text-white" />
+                                <BlueCheck width="0.8rem" height="0.8rem" />
                               </div>
                             )}
                           </div>
