@@ -6,6 +6,7 @@ import {
   editProfile,
   followingOrUnfollow,
   getProfile,
+  getSearchHistory,
   getSuggestedUsers,
   login,
   logout,
@@ -29,12 +30,13 @@ router
   .post(isAuthenticated, followingOrUnfollow);
 router.route("/search").get(isAuthenticated, searchUser);
 
+router.route("/history-search").get(isAuthenticated, getSearchHistory);
 router
   .route("/history-search/add")
   .post(isAuthenticated, addUserToHistorySearch);
 
 router
-  .route("/history-search/delete")
+  .route("/history-search/delete/:id")
   .delete(isAuthenticated, deleteUserFromHistoryUserSearch);
 
 router

@@ -302,10 +302,12 @@ export const deleteUserFromHistoryUserSearch = async (req, res) => {
   try {
     const userId = req.id;
     const user = await User.findOne({ _id: userId });
-    const searchUserId = req.body.searchUserId;
-    const updateHistorySearch = user.searchHistory.filter(
-      (id) => id !== searchUserId
-    );
+    const searchUserId = req.params.id;
+
+    const updateHistorySearch = user.searchHistory.filter((id) => {
+      return id.toString() !== searchUserId;
+    });
+
     user.searchHistory = updateHistorySearch;
     await user.save();
     return res.status(200).json({
@@ -327,6 +329,29 @@ export const deleteAllHistorySearch = async (req, res) => {
       success: true,
       message: "Delete all search history successfully",
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSearchHistory = async (req, res) => {
+  try {
+    const userId = req.id;
+    let user = await User.findOne({ _id: userId });
+    user = await user.populate({
+      path: "searchHistory",
+      select: "_id username bio isUserBlue followers profilePicture",
+      transform: (doc) => ({
+        _id: doc._id,
+        username: doc.username,
+        bio: doc.bio,
+        countFollowers: doc.followers.length,
+        profilePicture: doc.profilePicture,
+        isUserBlue: doc.isUserBlue,
+      }),
+    });
+    const searchHistory = user.searchHistory;
+    return res.status(200).json({ success: true, searchHistory });
   } catch (error) {
     throw error;
   }

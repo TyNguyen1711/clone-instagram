@@ -6,11 +6,12 @@ import {
   addUserToHistorySearchApi,
   deleteAllHistorySearchApi,
   deleteUserFromHistorySearchApi,
+  getSearchHistoryApi,
   searchUserApi,
 } from "@/services/api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setUserProfile } from "@/redux/authSlice";
+import { setAuthUser, setUserProfile } from "@/redux/authSlice";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
 
 const SearchPanel = ({ isOpen, onClose }) => {
@@ -21,6 +22,9 @@ const SearchPanel = ({ isOpen, onClose }) => {
   const bufferUser = user;
   const [recentSearches, setRecenteSearches] = useState(user?.searchHistory);
   const navigate = useNavigate();
+  useEffect(() => {
+    setSearchQuery("");
+  }, []);
   useEffect(() => {
     const fetchDataSearch = async () => {
       if (!searchQuery.trim()) return;
@@ -34,16 +38,36 @@ const SearchPanel = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   const handlerClickUser = async (userId) => {
     const response = await addUserToHistorySearchApi(userId);
+    if (response.success) {
+      const res = await getSearchHistoryApi();
+      if (res.success) {
+        const newUser = { ...user, searchHistory: res.searchHistory };
+        setRecenteSearches(res.searchHistory);
+        dispatch(setAuthUser(newUser));
+      }
+    }
     onClose();
     navigate(`/profile/${userId}`);
+    setSearchQuery("");
   };
   const handlerClickDelete = async (userId) => {
     const response = await deleteUserFromHistorySearchApi(userId);
-    console.log("response: ", response);
+    if (response.success) {
+      const res = await getSearchHistoryApi();
+      if (res.success) {
+        const newUser = { ...user, searchHistory: res.searchHistory };
+        setRecenteSearches(res.searchHistory);
+        dispatch(setAuthUser(newUser));
+      }
+    }
   };
   const handlerClickDeleteAll = async () => {
     const response = await deleteAllHistorySearchApi();
-    console.log("response: ", response);
+    if (response.success) {
+      const newUser = { ...user, searchHistory: [] };
+      setRecenteSearches([]);
+      dispatch(setAuthUser(newUser));
+    }
   };
   return (
     <div className="fixed top-0 left-[73px] w-[397px] h-screen bg-white border-r border-gray-200 z-50">

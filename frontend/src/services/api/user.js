@@ -102,9 +102,9 @@ export const addUserToHistorySearchApi = async (userId) => {
 
 export const deleteUserFromHistorySearchApi = async (userId) => {
   try {
-    const response = await axios.delete("/user/history-search/delete", {
-      searchUserId: userId,
-    });
+    const response = await axios.delete(
+      `/user/history-search/delete/${userId}`
+    );
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);
@@ -114,11 +114,20 @@ export const deleteUserFromHistorySearchApi = async (userId) => {
 
 export const deleteAllHistorySearchApi = async () => {
   try {
-    const response = await axios.delete("/user/history-search/delete-all", {});
+    const response = await axios.delete("/user/history-search/delete-all");
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);
+    throw error;
+  }
+};
 
+export const getSearchHistoryApi = async () => {
+  try {
+    const response = await axios.get("/user/history-search");
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
     throw error;
   }
 };
