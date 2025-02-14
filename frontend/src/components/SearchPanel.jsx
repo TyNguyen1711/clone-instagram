@@ -71,10 +71,10 @@ const SearchPanel = ({ isOpen, onClose }) => {
     }
   };
   return (
-    <div className="fixed top-0 left-[73px] w-[397px] h-screen bg-white border-r border-gray-200 z-50">
+    <div className="fixed top-0 left-[64px] w-[360px] h-screen bg-white border-r border-gray-200 z-50 rounded-r-2xl shadow-[4px_0px_14px_rgba(0,0,0,0.1)]">
       <div className="flex flex-col h-full">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Search</h2>
+        <div className="px-3 py-5 border-b border-gray-300">
+          <h2 className="text-2xl font-bold mb-8">Search</h2>
           <div className="relative">
             <input
               type="text"
@@ -99,7 +99,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
           <div className="px-6 pb-6">
             {!searchQuery ? (
               <>
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mt-4 mb-3">
                   <h3 className="font-semibold">Recent</h3>
                   <button
                     onClick={handlerClickDeleteAll}
@@ -114,7 +114,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
                     onClick={() => {
                       handlerClickUser(user._id);
                     }}
-                    className="flex items-center justify-between py-2 hover:bg-gray-100 rounded-lg cursor-pointer group px-2"
+                    className="flex items-center justify-between py-2 hover:bg-gray-100 rounded-lg cursor-pointer group"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-11 w-11">
@@ -126,7 +126,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
                           {user.username.slice(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className="flex flex-col gap-0">
                         <div className="flex items-center gap-1">
                           <span className="font-semibold text-sm">
                             {user.username}

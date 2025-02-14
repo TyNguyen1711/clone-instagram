@@ -119,6 +119,7 @@ const LeftSidebar = () => {
                   onClick={() => {
                     setIsCollapsed(false);
                   }}
+                  className="p-4"
                 >
                   <FaInstagram size={22} />
                 </div>

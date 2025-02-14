@@ -2,7 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "react-router-dom";
-import { MoreHorizontal, Smile } from "lucide-react";
+import {
+  Bookmark,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+  Smile,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
 import { commentPostApi } from "@/services/api/post.js";
@@ -11,6 +17,7 @@ import { setPosts } from "@/redux/postSlice.js";
 
 import { toast } from "sonner";
 import Comment from "./Comment";
+import { FaRegHeart } from "react-icons/fa6";
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
@@ -61,30 +68,32 @@ const CommentDialog = ({ open, setOpen }) => {
     <Dialog open={open}>
       <DialogContent
         onInteractOutside={() => setOpen(false)}
-        className="max-w-5xl p-0 flex flex-col min-h-[650px]"
+        className="max-w-5xl p-0 flex flex-col h-[92vh] max-h-[700px] overflow-hidden"
       >
-        {/* Rest of your component remains the same */}
-        <div className="flex flex-1">
-          <div>
+        <div className="flex flex-1 h-full">
+          <div className="w-1/2 bg-black flex items-center justify-center">
             {selectedPost?.type === "image" ? (
               <img
-                className="w-full h-full object-cover rounded-l-lg"
+                className="w-full h-full object-cover"
                 src={selectedPost?.srcURL}
                 alt="post"
               />
             ) : (
-              <video className="w-full p-1" controls>
+              <video
+                className="w-full h-full object-container object-center"
+                controls
+              >
                 <source src={selectedPost?.srcURL} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             )}
           </div>
 
-          <div className="w-2/3 justify-between">
-            <div className="flex justify-between items-center border-b border-gray-200">
-              <div className="flex items-center gap-2 p-4">
+          <div className="w-1/2 flex flex-col h-full">
+            <div className="flex justify-between items-center border-b border-gray-200 py-3 px-4">
+              <div className="flex items-center gap-3">
                 <Link>
-                  <Avatar>
+                  <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={selectedPost?.author.profilePicture}
                       alt="profile"
@@ -93,7 +102,7 @@ const CommentDialog = ({ open, setOpen }) => {
                   </Avatar>
                 </Link>
                 <div>
-                  <Link className="font-semibold text-xs">
+                  <Link className="font-semibold text-sm">
                     {selectedPost?.author.username}
                   </Link>
                 </div>
@@ -101,7 +110,7 @@ const CommentDialog = ({ open, setOpen }) => {
 
               <Dialog>
                 <DialogTrigger>
-                  <MoreHorizontal className="cursor-pointer mr-3" />
+                  <MoreHorizontal className="cursor-pointer" />
                 </DialogTrigger>
                 <DialogContent>
                   <Button variant="ghost" className="text-[#ED4956] font-bold">
@@ -112,40 +121,72 @@ const CommentDialog = ({ open, setOpen }) => {
               </Dialog>
             </div>
 
-            <div className="flex-1 p-4 max-h-96 overflow-y-auto">
-              {comment?.map((comment, index) => (
-                <Comment key={index} comment={comment} />
-              ))}
+            <div className="flex-1 overflow-y-auto scrollbar-hide">
+              <div className="p-4">
+                {comment?.map((comment, index) => (
+                  <Comment key={index} comment={comment} />
+                ))}
+              </div>
             </div>
-            <div className="p-4 flex items-center relative">
-              <button
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="p-2 hover:bg-gray-100 rounded-full mr-2"
-              >
-                <Smile className="w-5 h-5 text-gray-500" />
-              </button>
 
-              {showEmojiPicker && (
-                <div className="absolute bottom-16 left-0">
-                  <EmojiPicker onEmojiClick={onEmojiClick} />
+            <div className="border-t border-gray-300 bg-white">
+              <div className="border-b border-gray-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 px-4 pt-3">
+                    <FaRegHeart
+                      className="cursor-pointer hover:text-gray-600"
+                      size={"24px"}
+                    />
+                    <MessageCircle
+                      className="cursor-pointer hover:text-gray-600"
+                      size={24}
+                    />
+                    <Send
+                      className="cursor-pointer hover:text-gray-600"
+                      size={24}
+                    />
+                  </div>
+                  <div className="mr-3">
+                    <Bookmark
+                      className={`cursor-pointer hover:text-gray-600`}
+                    />
+                  </div>
                 </div>
-              )}
+                <div className="px-5 pt-3 text-sm font-semibold">
+                  {selectedPost?.likes.length} likes
+                </div>
+                <div className="px-5 text-[12px] text-gray-500 pb-2">21 thang 1</div>
+              </div>
+              <div className="p-1 flex items-center relative">
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="p-2 hover:bg-gray-100 rounded-full mr-2"
+                >
+                  <Smile className="w-5 h-5 text-gray-500" />
+                </button>
 
-              <input
-                type="text"
-                placeholder="Thêm bình luận..."
-                className="outline-none w-full border p-2 rounded-sm mr-2"
-                value={text}
-                onChange={handleChangeInput}
-              />
-              <Button
-                disabled={!text.trim()}
-                variant="ghost"
-                className="border"
-                onClick={sendMessageHandler}
-              >
-                Gửi
-              </Button>
+                {showEmojiPicker && (
+                  <div className="absolute bottom-16 left-0 z-10">
+                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                  </div>
+                )}
+
+                <input
+                  type="text"
+                  placeholder="Thêm bình luận..."
+                  className="outline-none w-full text-sm py-2"
+                  value={text}
+                  onChange={handleChangeInput}
+                />
+                <Button
+                  disabled={!text.trim()}
+                  variant="ghost"
+                  className="text-blue-500 font-semibold disabled:opacity-50 disabled:text-blue-200"
+                  onClick={sendMessageHandler}
+                >
+                  Post
+                </Button>
+              </div>
             </div>
           </div>
         </div>

@@ -20,8 +20,6 @@ export const LogoInstagramIcon = ({
 );
 
 export const BlueCheck = ({ width = "1rem", height = "1rem", className }) => {
-  console.log("width: ", width);
-  console.log("height: ", height);
   return (
     <svg
       className={className}
