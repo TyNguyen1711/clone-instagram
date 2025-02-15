@@ -15,8 +15,11 @@ import {
   setSelectedUser,
   setUserProfile,
 } from "@/redux/authSlice";
+import { setSelectedPost } from "@/redux/postSlice";
+import CommentDialog from "./CommentDialog";
 
 const Profile = () => {
+  const [open, setOpen] = useState(false);
   const params = useParams();
   const userId = params.id;
   useGetUserProfile(userId);
@@ -67,9 +70,13 @@ const Profile = () => {
     }
   };
   const handlerClickMessage = () => {
-    console.log("111: ", userProfile)
     dispatch(setSelectedUser(userProfile));
     navigate("/chat");
+  };
+  const handlerClickPost = (post) => {
+    console.log("post: ", 123);
+    setOpen(true);
+    dispatch(setSelectedPost(post));
   };
   return (
     <div className="max-w-5xl mx-auto pl-20 justify-center">
@@ -139,7 +146,7 @@ const Profile = () => {
               )}
             </div>
           </div>
-
+          <CommentDialog open={open} setOpen={setOpen} />
           <div className="flex items-center gap-10 py-4">
             <div>
               <span className="font-semibold">{userProfile?.posts.length}</span>{" "}
@@ -229,7 +236,13 @@ const Profile = () => {
       <div className="grid grid-cols-3 gap-3">
         {displayPosts?.map((post, index) => {
           return (
-            <div key={index} className="relative cursor-pointer group">
+            <div
+              key={index}
+              className="relative cursor-pointer group"
+              onClick={() => {
+                handlerClickPost(post);
+              }}
+            >
               {post?.type === "image" ? (
                 <img
                   src={post.srcURL}
@@ -237,7 +250,7 @@ const Profile = () => {
                   className="rounded-sm aspect-square object-cover w-full"
                 />
               ) : (
-                <video className="rounded-sm w-full" controls>
+                <video className="rounded-sm w-full h-full object-cover">
                   <source src={post?.srcURL} type="video/mp4" />
                 </video>
               )}

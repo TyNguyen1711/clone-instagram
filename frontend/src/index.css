@@ -16,3 +16,9 @@
         /* Chrome, Safari and Opera */
     }
 }
+
+
+
+.custom-video::-webkit-media-controls-timeline {
+    display: none !important;
+}

@@ -104,11 +104,22 @@ export const logout = async (req, res) => {
 export const getProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById({ _id: userId })
+    const user = await User.findById(userId)
       .select("-password")
       .populate({
         path: "posts",
-        createdAt: -1,
+        options: { sort: { createdAt: -1 } },
+        populate: [
+          {
+            path: "comments",
+            model: "Comment",
+            populate: {
+              path: "author",
+              model: "User",
+              select: "username profilePicture",
+            },
+          },
+        ],
       })
       .populate({
         path: "bookmarks",
@@ -120,7 +131,10 @@ export const getProfile = async (req, res) => {
       user,
     });
   } catch (error) {
-    throw error;
+    console.error(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 };
 

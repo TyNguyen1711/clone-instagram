@@ -175,37 +175,124 @@ export const dislikePost = async (req, res) => {
   }
 };
 
+// export const addComment = async (req, res) => {
+//   try {
+//     const userId = req.id;
+//     const postId = req.params.id;
+//     const { text } = req.body;
+//     const post = await Post.findById(postId);
+//     if (!text)
+//       return res
+//         .status(400)
+//         .json({ success: false, mes: "Content is required" });
+//     const comment = await Comment.create({
+//       text,
+//       author: userId,
+//       post: postId,
+//     });
+//     await comment.populate({
+//       path: "author",
+//       select: "username profilePicture",
+//     });
+//     post.comments.push(comment._id);
+//     await post.save();
+//     return res.status(201).json({
+//       message: "Comment added",
+//       success: true,
+//       comment,
+//     });
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 export const addComment = async (req, res) => {
   try {
     const userId = req.id;
     const postId = req.params.id;
-    const { text } = req.body;
-    const post = await Post.findById(postId);
-    if (!text)
+    const { text, mentions } = req.body;
+
+    if (!text) {
       return res
         .status(400)
-        .json({ success: false, mes: "Content is required" });
-    const comment = await Comment.create({
-      text,
-      author: userId,
-      post: postId,
-    });
+        .json({ success: false, message: "Content is required" });
+    }
+
+    // Xử lý mentions
+    let processedMentions = [];
+
+    if (mentions && Array.isArray(mentions) && mentions.length > 0) {
+      // Lọc bỏ mentions không hợp lệ (username rỗng hoặc null/undefined)
+      const validMentions = mentions.filter(
+        (mention) =>
+          mention &&
+          mention.username &&
+          mention.username.trim() !== "" &&
+          Array.isArray(mention.indices) &&
+          mention.indices.length === 2
+      );
+
+      if (validMentions.length > 0) {
+        const usernames = validMentions.map((m) => m.username);
+        const mentionedUsers = await User.find({
+          username: { $in: usernames },
+        });
+
+        // Tạo map username -> userId
+        const usernameToId = {};
+        mentionedUsers.forEach((user) => {
+          usernameToId[user.username] = user._id;
+        });
+
+        // Lọc và xử lý mentions hợp lệ
+        processedMentions = validMentions
+          .filter((mention) => usernameToId[mention.username])
+          .map((mention) => ({
+            username: mention.username,
+            userId: usernameToId[mention.username],
+            indices: mention.indices,
+          }));
+      }
+    }
+
+    // Tìm post và tạo comment đồng thời
+    const [post, comment] = await Promise.all([
+      Post.findById(postId),
+      Comment.create({
+        text,
+        author: userId,
+        post: postId,
+        mentions: processedMentions,
+      }),
+    ]);
+
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
     await comment.populate({
       path: "author",
       select: "username profilePicture",
     });
+
     post.comments.push(comment._id);
     await post.save();
+
     return res.status(201).json({
       message: "Comment added",
       success: true,
       comment,
     });
   } catch (error) {
-    throw error;
+    console.error("Error adding comment:", error);
+    return res.status(500).json({
+      message: "Đã xảy ra lỗi khi thêm comment",
+      success: false,
+      error: error.message,
+    });
   }
 };
-
 export const getCommentsPost = async (req, res) => {
   try {
     const postId = req.params.id;

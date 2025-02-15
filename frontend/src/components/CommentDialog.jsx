@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { Link } from "react-router-dom";
@@ -23,15 +23,20 @@ const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { selectedPost } = useSelector((state) => state.post);
+  const [replyUser, setReplyUser] = useState("");
   const { posts } = useSelector((state) => state.post);
   const [comment, setComment] = useState(selectedPost?.comments);
   const dispatch = useDispatch();
-
+  const inputRef = useRef(null);
   const onEmojiClick = (emojiObject) => {
     setText((prevText) => prevText + emojiObject.emoji);
     setShowEmojiPicker(false);
   };
-
+  const handleReplyClick = (username) => {
+    setReplyUser(`@${username} `);
+    setText(`@${username} `);
+    inputRef.current.focus();
+  };
   useEffect(() => {
     if (selectedPost) {
       setComment(selectedPost.comments);
@@ -40,14 +45,31 @@ const CommentDialog = ({ open, setOpen }) => {
   const handleChangeInput = (e) => {
     const inputText = e.target.value;
     if (inputText.trim()) {
-      setText(inputText.trim());
+      setText(inputText);
     } else {
       setText("");
     }
   };
+  const extractMentions = (text) => {
+    const regex = /@(\w+)/g;
+    const mentions = [];
+    let match;
 
+    while ((match = regex.exec(text)) !== null) {
+      mentions.push({
+        username: match[1],
+        indices: [match.index, match.index + match[0].length],
+      });
+    }
+    return mentions;
+  };
   const sendMessageHandler = async () => {
-    const response = await commentPostApi(selectedPost._id, text);
+    const extractedMentions = extractMentions(text);
+    const payload = {
+      text,
+      mentions: extractedMentions,
+    };
+    const response = await commentPostApi(selectedPost._id, payload);
     if (response.success) {
       toast.success(response.message);
       setComment([response.comment, ...comment]);
@@ -80,8 +102,9 @@ const CommentDialog = ({ open, setOpen }) => {
               />
             ) : (
               <video
-                className="w-full h-full object-container object-center"
+                className="w-full h-full object-cover object-center custom-video"
                 controls
+                autoPlay
               >
                 <source src={selectedPost?.srcURL} type="video/mp4" />
                 Your browser does not support the video tag.
@@ -124,7 +147,11 @@ const CommentDialog = ({ open, setOpen }) => {
             <div className="flex-1 overflow-y-auto scrollbar-hide">
               <div className="p-4">
                 {comment?.map((comment, index) => (
-                  <Comment key={index} comment={comment} />
+                  <Comment
+                    key={index}
+                    comment={comment}
+                    handleReplyClick={handleReplyClick}
+                  />
                 ))}
               </div>
             </div>
@@ -155,7 +182,9 @@ const CommentDialog = ({ open, setOpen }) => {
                 <div className="px-5 pt-3 text-sm font-semibold">
                   {selectedPost?.likes.length} likes
                 </div>
-                <div className="px-5 text-[12px] text-gray-500 pb-2">21 thang 1</div>
+                <div className="px-5 text-[12px] text-gray-500 pb-2">
+                  21 thang 1
+                </div>
               </div>
               <div className="p-1 flex items-center relative">
                 <button
@@ -172,6 +201,7 @@ const CommentDialog = ({ open, setOpen }) => {
                 )}
 
                 <input
+                  ref={inputRef}
                   type="text"
                   placeholder="Thêm bình luận..."
                   className="outline-none w-full text-sm py-2"

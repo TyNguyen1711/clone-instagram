@@ -39,11 +39,9 @@ export const likeOrDislikeHandler = async (postId, action) => {
   }
 };
 
-export const commentPostApi = async (postId, content) => {
+export const commentPostApi = async (postId, payload) => {
   try {
-    const response = await axios.post(`/post/${postId}/comment`, {
-      text: content,
-    });
+    const response = await axios.post(`/post/${postId}/comment`, payload);
     return response;
   } catch (error) {
     toast.error(error.response.data.mes);

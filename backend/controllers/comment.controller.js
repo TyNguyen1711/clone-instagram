@@ -33,7 +33,6 @@ export const replyComment = async (req, res) => {
       const { originalCommentId, text } = req.body;
       const userId = req.id;
   
-      // Kiểm tra nếu thiếu dữ liệu
       if (!originalCommentId || !text) {
         return res.status(400).json({ success: false, message: "Missing data" });
       }
@@ -43,21 +42,19 @@ export const replyComment = async (req, res) => {
         return res.status(404).json({ success: false, message: "Comment not found" });
       }
   
-      // Tạo reply
       const comment = await Comment.create({
         text,
         author: userId,
         post: commentOriginal.post,
       });
   
-      // Populate author để trả về đầy đủ thông tin
+
       await comment.populate("author", "username profilePicture");
   
-      // Thêm comment vào danh sách replies
+
       commentOriginal.replies.unshift(comment._id);
       await commentOriginal.save();
   
-      // Trả về dữ liệu
       return res.status(201).json({
         success: true,
         message: "Reply added successfully",
