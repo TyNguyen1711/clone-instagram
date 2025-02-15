@@ -11,15 +11,23 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useDispatch, useSelector } from "react-redux";
-import { commentPostApi } from "@/services/api/post.js";
+import { commentPostApi, likeOrDislikeHandler } from "@/services/api/post.js";
 import EmojiPicker from "emoji-picker-react";
-import { setPosts } from "@/redux/postSlice.js";
+import { setPosts, setSelectedPost } from "@/redux/postSlice.js";
 
 import { toast } from "sonner";
 import Comment from "./Comment";
-import { FaRegHeart } from "react-icons/fa6";
+import { FaHeart, FaRegHeart } from "react-icons/fa6";
 
-const CommentDialog = ({ open, setOpen }) => {
+const CommentDialog = ({
+  open,
+  setOpen,
+  liked,
+  handleLikeOrDislike,
+  postLike,
+  bookMarked,
+  handlerClickBookmark,
+}) => {
   const [text, setText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { selectedPost } = useSelector((state) => state.post);
@@ -83,7 +91,14 @@ const CommentDialog = ({ open, setOpen }) => {
       );
       setText("");
       dispatch(setPosts(updatePostsData));
+      dispatch(
+        setSelectedPost({
+          ...selectedPost,
+          comments: [response.comment, ...selectedPost.comments],
+        })
+      );
     }
+
   };
 
   return (
@@ -160,10 +175,20 @@ const CommentDialog = ({ open, setOpen }) => {
               <div className="border-b border-gray-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 px-4 pt-3">
-                    <FaRegHeart
-                      className="cursor-pointer hover:text-gray-600"
-                      size={"24px"}
-                    />
+                    {liked ? (
+                      <FaHeart
+                        size={"22"}
+                        onClick={handleLikeOrDislike}
+                        className="cursor-pointer text-red-600"
+                      />
+                    ) : (
+                      <FaRegHeart
+                        onClick={handleLikeOrDislike}
+                        className="cursor-pointer hover:text-gray-600"
+                        size={"22px"}
+                      />
+                    )}
+
                     <MessageCircle
                       className="cursor-pointer hover:text-gray-600"
                       size={24}
@@ -175,12 +200,15 @@ const CommentDialog = ({ open, setOpen }) => {
                   </div>
                   <div className="mr-3">
                     <Bookmark
-                      className={`cursor-pointer hover:text-gray-600`}
+                      onClick={handlerClickBookmark}
+                      className={`cursor-pointer hover:text-gray-600 ${
+                        bookMarked ? "fill-black" : "fill-none"
+                      }`}
                     />
                   </div>
                 </div>
                 <div className="px-5 pt-3 text-sm font-semibold">
-                  {selectedPost?.likes.length} likes
+                  {postLike} likes
                 </div>
                 <div className="px-5 text-[12px] text-gray-500 pb-2">
                   21 thang 1

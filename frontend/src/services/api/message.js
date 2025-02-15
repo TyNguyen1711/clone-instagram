@@ -21,3 +21,4 @@ export const getAllMessageApi = async (receiverId) => {
     throw error;
   }
 };
+

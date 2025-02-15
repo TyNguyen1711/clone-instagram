@@ -23,12 +23,22 @@ const Post = ({ post }) => {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const { posts } = useSelector((state) => state.post);
-  const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
-  const [bookMarked, setBookMarked] = useState(
-    user?.bookmarks?.includes(post?._id)
-  );
+  const liked = post.likes.includes(user?._id);
+  const bookMarked = user?.bookmarks?.includes(post?._id);
   const [postLike, setPostLike] = useState(post.likes.length);
+  const extractMentions = (text) => {
+    const regex = /@(\w+)/g;
+    const mentions = [];
+    let match;
 
+    while ((match = regex.exec(text)) !== null) {
+      mentions.push({
+        username: match[1],
+        indices: [match.index, match.index + match[0].length],
+      });
+    }
+    return mentions;
+  };
   const dispatch = useDispatch();
   const handlerDeletePost = async () => {
     const response = await deletePostApi(post._id);
@@ -42,11 +52,8 @@ const Post = ({ post }) => {
   const handleLikeOrDislike = async () => {
     const action = liked ? "dislike" : "like";
     const response = await likeOrDislikeHandler(post._id, action);
-    if (response.success) {
-      const updateLike = liked ? postLike - 1 : postLike + 1;
-      setPostLike(updateLike);
-      setLiked(!liked);
 
+    if (response.success) {
       const updatePostsData = posts.map((p) =>
         p._id === post._id
           ? {
@@ -62,7 +69,12 @@ const Post = ({ post }) => {
     }
   };
   const commentHandler = async () => {
-    const response = await commentPostApi(post._id, text);
+    const extractedMentions = extractMentions(text);
+    const payload = {
+      text,
+      mentions: extractedMentions,
+    };
+    const response = await commentPostApi(post._id, payload);
     if (response.success) {
       toast.success(response.message);
       setText("");
@@ -82,17 +94,12 @@ const Post = ({ post }) => {
     const response = await bookMarkApi(post?._id);
 
     if (response.success) {
-      setBookMarked((prevBookmarked) => {
-        const newBookmarkData = prevBookmarked
-          ? (user.bookmarks || []).filter((item) => item !== post?._id)
-          : [...(user.bookmarks || []), post._id];
+      const newBookmarkData = bookMarked
+        ? (user.bookmarks || []).filter((item) => item !== post?._id)
+        : [...(user.bookmarks || []), post._id];
 
-        const newUserData = { ...user, bookmarks: newBookmarkData };
-        dispatch(setAuthUser(newUserData));
-
-        return !prevBookmarked;
-      });
-
+      const newUserData = { ...user, bookmarks: newBookmarkData };
+      dispatch(setAuthUser(newUserData));
       toast.success(response.mes || "Updated bookmark!");
     }
   };
@@ -203,7 +210,15 @@ const Post = ({ post }) => {
           </span>
         )}
 
-        <CommentDialog open={open} setOpen={setOpen} />
+        <CommentDialog
+          open={open}
+          setOpen={setOpen}
+          liked={liked}
+          handleLikeOrDislike={handleLikeOrDislike}
+          postLike={postLike}
+          bookMarked={bookMarked}
+          handlerClickBookmark={handlerClickBookmark}
+        />
         <div className="flex my-2 items-center">
           <input
             type="text"
