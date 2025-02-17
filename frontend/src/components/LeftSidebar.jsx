@@ -34,14 +34,14 @@ const LeftSidebar = () => {
 
   const sidebarItems = [
     {
-      icon: type === "Home" ? <GoHomeFill size={24} /> : <GoHome size={24} />,
+      icon: type === "Home" ? <GoHomeFill size={26} /> : <GoHome size={26} />,
       text: "Home",
     },
-    { icon: <Search />, text: "Search" },
-    { icon: <TrendingUp />, text: "Explore" },
-    { icon: <MessageCircle />, text: "Messages" },
-    { icon: <Heart />, text: "Notifications" },
-    { icon: <PlusSquare />, text: "Create" },
+    { icon: <Search size={26} />, text: "Search" },
+    { icon: <TrendingUp size={26} />, text: "Explore" },
+    { icon: <MessageCircle size={26} />, text: "Messages" },
+    { icon: <Heart size={26} />, text: "Notifications" },
+    { icon: <PlusSquare size={26} />, text: "Create" },
     {
       icon: (
         <Avatar className="w-6 h-6">
@@ -141,7 +141,7 @@ const LeftSidebar = () => {
                   {item.icon}
                 </div>
                 {!isCollapsed && (
-                  <span className="ml-3 text-sm whitespace-nowrap">
+                  <span className="ml-3 text-[16px] whitespace-nowrap">
                     {item.text}
                   </span>
                 )}

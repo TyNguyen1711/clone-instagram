@@ -9,7 +9,6 @@ const useGetUserProfile = (userId) => {
     useEffect(() => {
       const fetchUserProfile = async () => {
         const res = await getProfileApi(userId);
-        console.log("res123: ", res);
         if (res.success) {
           dispatch(setUserProfile(res.user));
         }

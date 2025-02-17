@@ -11,7 +11,6 @@ const Message = ({ selectedUser, messagesEndRef }) => {
     useGetAllMessage();
     useGetRTM();
   }
-
   const { messages } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -24,6 +23,7 @@ const Message = ({ selectedUser, messagesEndRef }) => {
             <AvatarImage src={selectedUser?.profilePicture} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
+          
           <div>{selectedUser?.username}</div>
           <Button
             variant="ghost"

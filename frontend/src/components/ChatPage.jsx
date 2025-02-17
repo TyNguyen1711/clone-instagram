@@ -7,7 +7,8 @@ import { Button } from "./ui/button";
 import { sendMessageApi } from "@/services/api/message.js";
 import { setMessages } from "@/redux/chatSlice";
 import Message from "./Message";
-
+import { Smile } from "lucide-react";
+import { IconGalary, IconHeart, IconSticker, Microphone } from "./icon";
 const ChatPage = () => {
   const [textMessage, setTextMessage] = useState("");
   const { user, suggestedUsers, selectedUser } = useSelector(
@@ -39,7 +40,7 @@ const ChatPage = () => {
   };
 
   useEffect(() => {
-    dispatch(setSelectedUser(null))
+    dispatch(setSelectedUser(null));
   }, []);
 
   // Scroll xuống cuối khi có tin nhắn mới
@@ -48,11 +49,11 @@ const ChatPage = () => {
   }, [messages]);
 
   return (
-    <div className="h-screen ml-[16%] flex">
+    <div className="h-screen ml-[5%] flex">
       {/* Users List Section */}
-      <section className="w-full md:w-1/4 h-screen flex flex-col">
-        <div className="p-4 border-b border-gray-300">
-          <h1 className="font-medium">{user?.username}</h1>
+      <section className="w-full w-[400px] h-screen flex flex-col border-r border-gray-300">
+        <div className="p-4 py-8">
+          <h1 className="font-bold text-[20px]">{user?.username}</h1>
         </div>
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {suggestedUsers?.map((suggestedUser, index) => {
@@ -64,7 +65,10 @@ const ChatPage = () => {
                 className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer rounded"
               >
                 <Avatar className="w-14 h-14">
-                  <AvatarImage src={suggestedUser?.profilePicture} alt="avatar" />
+                  <AvatarImage
+                    src={suggestedUser?.profilePicture}
+                    alt="avatar"
+                  />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
@@ -87,30 +91,55 @@ const ChatPage = () => {
 
       {/* Chat Section */}
       {selectedUser ? (
-        <section className="border-l border-l-gray-300 flex-1 h-screen flex flex-col">
-          <div className="flex items-center gap-3 border-b border-b-gray-300 py-2 px-3">
-            <Avatar>
+        <section className="flex-1 h-screen flex flex-col">
+          <div className="flex items-center gap-2 border-b border-b-gray-300 py-4 px-3">
+            <Avatar className="w-10 h-10">
               <AvatarImage src={selectedUser?.profilePicture} alt="profile" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <div>{selectedUser?.username}</div>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-            {selectedUser && <Message selectedUser={selectedUser} messagesEndRef={messagesEndRef} />}
+            <div>
+              <div>{selectedUser?.username}</div>
+              <div className="text-[12px] text-gray-500">
+                {onlineUsers.includes(selectedUser?._id)
+                  ? "Active now"
+                  : "No active"}
+              </div>
+            </div>
           </div>
 
-          <div className="p-4 border-t border-gray-300">
-            <div className="flex items-center gap-2">
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            {selectedUser && (
+              <Message
+                selectedUser={selectedUser}
+                messagesEndRef={messagesEndRef}
+              />
+            )}
+          </div>
+
+          <div className="p-5">
+            <div className="flex items-center gap-2 border border-gray-400 px-4 rounded-xl">
+              <button className="hover:bg-gray-100 rounded-full">
+                <Smile className="w-5 h-5 text-gray-500" />
+              </button>
+
               <input
                 value={textMessage}
                 onChange={(e) => setTextMessage(e.target.value)}
                 type="text"
                 placeholder="Messages ..."
-                className="flex-1 p-2 border border-gray-200 rounded focus-visible:ring-transparent outline-none"
-                onKeyPress={(e) => e.key === 'Enter' && sendMessageHandler()}
+                className="flex-1 p-3 border border-gray-200 rounded focus-visible:ring-transparent outline-none border-none"
+                onKeyPress={(e) => e.key === "Enter" && sendMessageHandler()}
               />
-              <Button onClick={sendMessageHandler}>Send</Button>
+              {textMessage ? (
+                <button onClick={sendMessageHandler}>Send</button>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Microphone width="1.5rem" height="1.5rem" />
+                  <IconGalary width="1.5rem" height="1.5rem" />
+                  <IconSticker width="1.5rem" height="1.5rem" />
+                  <IconHeart width="1.5rem" height="1.5rem" />
+                </div>
+              )}
             </div>
           </div>
         </section>

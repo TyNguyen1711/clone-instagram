@@ -40,7 +40,6 @@ const Profile = () => {
   const handleFollowUnfollowUser = async () => {
     try {
       const response = await followOrUnfollowApi(userProfile?._id);
-      console.log("response", response);
       if (response.success) {
         if (isFollowing) {
           const updateFollowers = userProfile?.followers.filter(
@@ -74,7 +73,6 @@ const Profile = () => {
     navigate("/chat");
   };
   const handlerClickPost = (post) => {
-    console.log("post: ", 123);
     setOpen(true);
     dispatch(setSelectedPost(post));
   };

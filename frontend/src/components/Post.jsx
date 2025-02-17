@@ -25,7 +25,7 @@ const Post = ({ post }) => {
   const { posts } = useSelector((state) => state.post);
   const liked = post.likes.includes(user?._id);
   const bookMarked = user?.bookmarks?.includes(post?._id);
-  const [postLike, setPostLike] = useState(post.likes.length);
+  const postLike = post.likes.length;
   const extractMentions = (text) => {
     const regex = /@(\w+)/g;
     const mentions = [];
@@ -226,7 +226,7 @@ const Post = ({ post }) => {
             value={text}
             onChange={(e) => {
               if (e.target.value.trim()) {
-                setText(e.target.value.trim());
+                setText(e.target.value);
               } else {
                 setText("");
               }

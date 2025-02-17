@@ -119,8 +119,14 @@ export const getProfile = async (req, res) => {
               select: "username profilePicture",
             },
           },
+          {
+            path: "author",
+            model: "User",
+            select: "username profilePicture",
+          },
         ],
       })
+
       .populate({
         path: "bookmarks",
         model: "Post",
