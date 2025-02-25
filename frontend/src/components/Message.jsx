@@ -6,6 +6,69 @@ import { useSelector } from "react-redux";
 import useGetRTM from "@/hooks/useGetRTM.js";
 import { useNavigate } from "react-router-dom";
 
+// Component to handle each message item
+const MessageItem = ({ msg, isCurrentUser }) => {
+  const { user } = useSelector((state) => state.auth);
+
+  if (!msg.content || msg.content.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      {msg.content.map((item, index) => {
+        // Text messages appear in blue/gray bubble
+        if (item.type === "text") {
+          return (
+            <div
+              key={`text-${index}`}
+              className={`flex ${
+                isCurrentUser ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`p-3 break-words rounded-2xl max-w-xs ${
+                  isCurrentUser ? "bg-blue-500 text-white" : "bg-gray-300"
+                }`}
+              >
+                {item.data}
+              </div>
+            </div>
+          );
+        }
+
+        // Media content (image, video, audio) appears standalone without bubbles
+        return (
+          <div
+            key={`media-${index}`}
+            className={`flex ${
+              isCurrentUser ? "justify-end" : "justify-start"
+            }`}
+          >
+            {item.type === "image" && (
+              <img
+                src={item.data}
+                alt="Image message"
+                className="max-w-xs rounded-lg max-h-64 object-contain"
+              />
+            )}
+
+            {item.type === "video" && (
+              <video
+                src={item.data}
+                controls
+                className="max-w-xs rounded-lg max-h-64"
+              />
+            )}
+
+            {item.type === "audio" && (
+              <audio src={item.data} controls className="max-w-xs w-full" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const Message = ({ selectedUser, messagesEndRef }) => {
   if (selectedUser) {
     useGetAllMessage();
@@ -23,7 +86,7 @@ const Message = ({ selectedUser, messagesEndRef }) => {
             <AvatarImage src={selectedUser?.profilePicture} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          
+
           <div>{selectedUser?.username}</div>
           <Button
             variant="ghost"
@@ -35,24 +98,13 @@ const Message = ({ selectedUser, messagesEndRef }) => {
         </div>
       </div>
 
-      <div className="flex-1 px-4 py-4 space-y-4">
+      <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
         {messages?.map((msg) => (
-          <div
+          <MessageItem
             key={msg._id}
-            className={`flex ${
-              msg.senderId === user._id ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`p-2 break-words rounded-2xl max-w-xs ${
-                msg.senderId === user._id
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-300"
-              }`}
-            >
-              {msg.message}
-            </div>
-          </div>
+            msg={msg}
+            isCurrentUser={msg.senderId === user._id}
+          />
         ))}
         <div ref={messagesEndRef} />
       </div>
