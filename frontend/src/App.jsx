@@ -13,6 +13,7 @@ import { setOnlineUsers } from "./redux/chatSlice.js";
 import { useEffect } from "react";
 import { setLikeNotification } from "./redux/rtnSlice.js";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Explore from "./components/Explore.jsx";
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -37,6 +38,10 @@ const browserRouter = createBrowserRouter([
       {
         path: "/chat",
         element: <ChatPage />,
+      },
+      {
+        path: "/explore",
+        element: <Explore />,
       },
     ],
   },

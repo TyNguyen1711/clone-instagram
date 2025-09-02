@@ -58,3 +58,13 @@ export const bookMarkApi = async (postId) => {
     throw error;
   }
 };
+
+export const getPostOfPage = async (page) => {
+  try {
+    const response = await axios.get(`/post/explore?page=${page}`);
+    return response;
+  } catch (error) {
+    toast.error(error.response.data.mes);
+    throw error;
+  }
+};

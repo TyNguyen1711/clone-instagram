@@ -71,7 +71,7 @@ const SearchPanel = ({ isOpen, onClose }) => {
     }
   };
   return (
-    <div className="fixed top-0 left-[64px] w-[360px] h-screen bg-white border-r border-gray-200 z-50 rounded-r-2xl shadow-[4px_0px_14px_rgba(0,0,0,0.1)]">
+    <div className="fixed top-0 left-[73px] w-[360px] h-screen bg-white border-r border-gray-200 z-50 rounded-r-2xl shadow-[4px_0px_14px_rgba(0,0,0,0.1)]">
       <div className="flex flex-col h-full">
         <div className="px-3 py-5 border-b border-gray-300">
           <h2 className="text-2xl font-bold mb-8">Search</h2>

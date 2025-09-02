@@ -468,7 +468,7 @@ const ChatPage = () => {
   return (
     <div className="h-screen ml-[5%] flex">
       {/* Users List Section */}
-      <section className="w-full w-[340px] h-screen flex flex-col border-r border-gray-300">
+      <section className="w-[340px] h-screen flex flex-col border-r border-gray-300">
         <div className="p-4 py-8">
           <h1 className="font-bold text-[20px]">{user?.username}</h1>
         </div>
@@ -547,7 +547,7 @@ const ChatPage = () => {
           <PreviewTray fileInputRef={fileInputRef} />
 
           <div className="p-5">
-            <div className="flex items-center gap-2 border border-gray-400 px-4 rounded-xl">
+            <div className="flex items-center gap-2 border border-gray-300 px-4 rounded-[16px]">
               <button className="hover:bg-gray-100 rounded-full">
                 <Smile className="w-5 h-5 text-gray-500" />
               </button>
