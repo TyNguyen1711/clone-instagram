@@ -381,3 +381,35 @@ export const bookmarkPost = async (req, res) => {
     throw error;
   }
 };
+export const getPostOfNumberLike = async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const limit = req.query.limit || 10;
+    const skip = (page - 1) * limit;
+    const posts = await Post.aggregate([
+      {
+        $addFields: {
+          likesCount: { $size: "$likes" },
+        },
+      },
+      { $sort: { likesCount: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author",
+          foreignField: "_id",
+          as: "author",
+        },
+      },
+      { $unwind: "$author" },
+    ]);
+    return res.json({
+      success: true,
+      posts: posts,
+    });
+  } catch (error) {
+    throw error;
+  }
+};

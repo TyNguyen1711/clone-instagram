@@ -4,6 +4,20 @@ const postSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  resources: [
+    {
+      srcURL: {
+        type: String,
+        default: "",
+        require: true,
+      },
+      type: {
+        type: String,
+        enum: ["image", "video"],
+        require: true,
+      },
+    },
+  ],
   srcURL: {
     type: String,
     default: "",
@@ -12,7 +26,7 @@ const postSchema = new mongoose.Schema({
   type: {
     type: String,
     enum: ["image", "video"],
-    require: true
+    require: true,
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,

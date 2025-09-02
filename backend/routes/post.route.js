@@ -11,6 +11,7 @@ import {
   getCommentsPost,
   getUserPost,
   likePost,
+  getPostOfNumberLike
 } from "../controllers/post.controller.js";
 const router = express.Router();
 
@@ -25,5 +26,5 @@ router.route("/:id/comment").post(isAuthenticated, addComment);
 router.route("/:id/comment/all").get(isAuthenticated, getCommentsPost);
 router.route("/delete/:id").post(isAuthenticated, deletePost);
 router.route("/:id/bookmark").post(isAuthenticated, bookmarkPost);
-
+router.route("/explore").get(isAuthenticated, getPostOfNumberLike)
 export default router;
